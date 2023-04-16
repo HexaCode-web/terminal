@@ -1,13 +1,6 @@
 /* DATABASE end*/
 import { initializeApp } from "firebase/app";
-import {
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  getFirestore,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getFirestore, getDoc } from "firebase/firestore";
 import DB from "../DBConfig.json";
 import React, { useEffect } from "react";
 import loadingDark from "../assets/loadingDark.gif";
@@ -16,12 +9,18 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import Users from "../components/DashUsers";
 import Products from "../components/DashProducts";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MyModal from "../components/Modal";
 import secureLocalStorage from "react-secure-storage";
 import DashCate from "../components/DashCate";
-
+import { CreateToast } from "../App";
+import {
+  DELETEDOC,
+  GETCOLLECTION,
+  GETDOC,
+  SETDOC,
+  productDistributor,
+} from "../server";
 const app = initializeApp(DB.firebaseConfig);
 const db = getFirestore(app);
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -46,6 +45,7 @@ export default function DashBoard(props) {
     verifyPass: "",
     newPass: "",
   });
+
   /*PERSONAL ADMIN INFO*/
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -65,18 +65,9 @@ export default function DashBoard(props) {
   };
   const validatePass = () => {
     if (changePass.verifyPass === changePass.oldPass) {
-      props.UpdateUser(null, true, changePass.newPass);
+      props.UpdateUser(ActiveUser, true, changePass.newPass);
     } else {
-      toast.error("Old Password doesn't match your password", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("Old Password doesn't match your password", "error");
     }
   };
   /*PERSONAL ADMIN INFO*/
@@ -85,7 +76,7 @@ export default function DashBoard(props) {
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const handlePrimaryAction = async (e) => {
-    await props.Delete("users", ActiveUser.id);
+    await DELETEDOC("users", ActiveUser.id);
     setShowModal(false);
     secureLocalStorage.clear();
     setTimeout(() => {
@@ -95,111 +86,86 @@ export default function DashBoard(props) {
   /* END USERS  SETTINGS*/
   /*GETTING NUMBERS*/
   const fetchNumbers = async () => {
-    let tempContainer = [];
-    const cleanUserList = [];
+    let cleanUserList = [];
     let catagoriesLocal = {};
-    let CataIcons = {};
-    const UsersList = await getDocs(collection(db, "users"));
-    await getDoc(doc(db, "statistics", "2")).then(
-      (res) => (CataIcons = res.data().categoriesIcons)
-    );
-    await getDoc(doc(db, "statistics", "1")).then((res) => {
-      catagoriesLocal = res.data().catagories;
-      const array = [];
-      let icon;
-      for (const category in catagoriesLocal) {
-        for (const Icon in CataIcons) {
-          if (Icon === category) {
-            icon = CataIcons[Icon];
-          }
-        }
-        array.push({
-          Name: category,
-          icon,
-        });
-      }
-      setCatagories(array);
-      for (const category in res.data().catagories) {
-        tempContainer.push(category);
-      }
+    await GETCOLLECTION("users").then((response) => {
+      cleanUserList = response;
     });
-    UsersList.forEach((doc) => {
-      const info = doc.data();
-      cleanUserList.push(info);
+    await GETCOLLECTION("categories").then((res) => {
+      setCatagories(res);
+      catagoriesLocal = res;
     });
+
     setUserList(cleanUserList);
-    const cleanProductsData = [];
-    const ProductsData = await getDocs(collection(db, "products"));
-    ProductsData.forEach((doc) => {
-      const info = doc.data();
-      cleanProductsData.push(info);
+    let cleanProductsData = [];
+    await GETCOLLECTION("products").then((response) => {
+      cleanProductsData = response;
     });
     setProductList(cleanProductsData);
     const getChartData = () => {
-      let returnArray = [];
-      for (const category in catagoriesLocal) {
-        returnArray.push(catagoriesLocal[category].length);
-      }
-      return returnArray;
+      let LengthAr = [];
+      let NameAR = [];
+      let ColorAr = [];
+      catagoriesLocal.forEach((category) => {
+        LengthAr.push(category.products.length);
+        NameAR.push(category.Name);
+        ColorAr.push(category.color);
+      });
+      return { LengthAr, NameAR, ColorAr };
     };
     setChartData({
-      labels: tempContainer,
+      labels: getChartData().NameAR,
       datasets: [
         {
           label: "Number of products",
-          data: getChartData(),
-          backgroundColor: [
-            "rgba(255, 99, 132, .7)",
-            "rgba(54, 162, 235, .7)",
-            "rgba(255, 206, 86, .7)",
-            "rgba(75, 192, 192, .7)",
-            "rgba(153, 102, 255, .7)",
-            "rgba(255, 159, 64, .7)",
-          ],
+          data: getChartData().LengthAr,
+          backgroundColor: getChartData().ColorAr,
           borderColor: ["#ee233a"],
         },
       ],
     });
-    const docSnap = await getDoc(doc(db, "statistics", "0"));
-    setStatistics(docSnap.data());
-    setNotes(docSnap.data().notes);
+    GETDOC("statistics", 0).then((value) => {
+      setStatistics(value);
+      setNotes(value.notes);
+    });
   };
   const CountUsers = async () => {
     setActiveUsers(0);
-    const srcData = await getDocs(collection(db, "users"));
-    setStatistics((prev) => {
-      return { ...prev, UserCount: srcData.size };
-    });
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      if (info.Active) {
-        setActiveUsers((prev) => prev + 1);
-      }
+    await GETCOLLECTION("users").then((response) => {
+      response.forEach((user) => {
+        if (user.Active) {
+          setActiveUsers((prev) => prev + 1);
+        }
+      });
     });
   };
   const ChangeStatues = async () => {
-    const srcData = await getDocs(collection(db, "users"));
-    const cleanData = [];
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      cleanData.push(info);
+    let cleanData = [];
+    await GETCOLLECTION("users").then((response) => {
+      cleanData = response;
     });
     cleanData.forEach((User) => {
       if (User.Username === ActiveUser.Username) {
         User.Active = true;
       }
-      setDoc(doc(db, "users", User.id.toString()), {
-        ...User,
-      });
+      SETDOC("users", User.id, { ...User });
     });
   };
   const AddNote = async () => {
     const tempData = {
       ...statistics,
-      notes: [document.querySelector("#NoteValue").value, ...statistics.notes],
+      notes: [
+        {
+          Text: document.querySelector("#NoteValue").value,
+          Maker: ActiveUser.Username,
+        },
+        ...Notes,
+      ],
     };
-    await setDoc(doc(db, "statistics", "0"), tempData);
-    window.location.reload();
+    await SETDOC("statistics", 0, { ...tempData });
+    await GETDOC("statistics", 0).then((res) => {
+      setNotes(res.notes);
+    });
   };
   const DeleteNote = async (index) => {
     const tempNote = Notes;
@@ -207,34 +173,36 @@ export default function DashBoard(props) {
     setNotes(tempNote);
     const tempData = {
       ...statistics,
-      notes: Notes,
+      notes: tempNote,
     };
-    await setDoc(doc(db, "statistics", "0"), tempData);
-    window.location.reload();
+    await SETDOC("statistics", 0, { ...tempData });
+    await GETDOC("statistics", 0).then((res) => {
+      setNotes(res.notes);
+    });
+  };
+  const distribute = async () => {
+    const productList = await GETCOLLECTION("products");
+    const catagories = await GETCOLLECTION("categories");
+    productDistributor(productList, catagories);
   };
   /*END GETTING NUMBERS*/
   useEffect(() => {
     fetchNumbers();
     ChangeStatues();
     CountUsers();
+    distribute();
     if (new Date().getHours() < 12) setGreeting("Good morning");
     else if (new Date().getHours() < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
   }, []);
-
+  useEffect(() => {
+    if (!(Object.keys(statistics).length === 0)) {
+      SETDOC("statistics", 0, { ...statistics, UserCount: UserList.length });
+    }
+  }, [statistics]);
   return (
     <div className="Dashboard">
-      {props.UserUpdated &&
-        toast.success("Updated your info!", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        })}
+      {props.UserUpdated && CreateToast("Updated your info!", "success")}
       <div className="SideBar">
         <h3 className="Greet">
           {greeting} <br />
@@ -343,7 +311,7 @@ export default function DashBoard(props) {
               </div>
               -
               <div className="Card">
-                <h6>Discount Amount:</h6>
+                <h6>Discounts Made :</h6>
                 <h5>
                   {statistics.TotalDiscount &&
                     Math.round(statistics.TotalDiscount)}
@@ -359,6 +327,7 @@ export default function DashBoard(props) {
             <div className="Charts">
               {chartData ? <Pie className="Chart" data={chartData} /> : ""}
             </div>
+
             <div className="Notes">
               <h3>Notes</h3>
               <div className="input-wrapper">
@@ -370,26 +339,26 @@ export default function DashBoard(props) {
                 <button onClick={AddNote}>Save</button>
               </div>
               <div className="note-wrapper">
-                {statistics.notes ? (
-                  statistics.notes.map((note, index) => (
-                    <div className="Note">
-                      <p>
-                        {index + 1}. {""}
-                        {""}
-                        {note}
-                      </p>
-                      <img
-                        alt="loading"
-                        src={deleteIcon}
-                        onClick={() => {
-                          DeleteNote(index);
-                        }}
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <h3>no notes yet</h3>
-                )}
+                {Notes &&
+                  Notes.map((note, index) => {
+                    return (
+                      <div className="Note">
+                        <p>
+                          {index + 1}. {""}
+                          {""}
+                          {note.Text}
+                        </p>
+                        <p style={{ marginLeft: "auto" }}>by {note.Maker}</p>
+                        <img
+                          alt="loading"
+                          src={deleteIcon}
+                          onClick={() => {
+                            DeleteNote(index);
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>
@@ -584,3 +553,13 @@ export default function DashBoard(props) {
     </div>
   );
 }
+/*
+    Revenue: 0,
+    CartNum: 0,
+    ProductsSold: [],
+    notes: [],
+    Net: 0,
+    UserCount: 0,
+    TotalDiscount: 0,
+    WishNum: 0
+ */

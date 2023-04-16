@@ -1,25 +1,17 @@
 import React, { useEffect } from "react";
-import { initializeApp } from "firebase/app";
-import {
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  getFirestore,
-} from "firebase/firestore";
-import DB from "../DBConfig.json";
-import DashBoard from "./Dashboard";
 import Profile from "./Profile";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import secureLocalStorage from "react-secure-storage";
+import { CreateToast } from "../App";
+import { GETCOLLECTION, GETDOC, SETDOC } from "../server";
+import sortBy from "sort-by";
+import loadingDark from "../assets/loadingDark.gif";
 
-const app = initializeApp(DB.firebaseConfig);
-const db = getFirestore(app);
-export default function User(props) {
+export default function User() {
   const [user] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser")) || ""
   );
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const [IsAdmin, setIsAdmin] = React.useState(false);
   const [showSignup, setShowSignUp] = React.useState(false);
@@ -29,6 +21,7 @@ export default function User(props) {
     Fname: "",
     address: "",
     admin: false,
+    CartCount: 0,
     cart: [],
     dateOfBirth: "",
     email: "",
@@ -51,6 +44,13 @@ export default function User(props) {
   });
   const changeForm = () => {
     setShowSignUp((prev) => !prev);
+    setLoginData({
+      Username: "",
+      Password: "",
+    });
+    setNewUser((prev) => {
+      return { ...prev, Username: "", Password: "" };
+    });
   };
 
   const UpdateInput = (form, event) => {
@@ -75,51 +75,39 @@ export default function User(props) {
   };
   const Signup = async (e) => {
     e.preventDefault();
-    const srcData = await getDocs(collection(db, "users"));
-    const cleanData = [];
     let id;
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      cleanData.push(info);
-      id = info.id + 1;
+    let cleanData = [];
+    await GETCOLLECTION("users").then((response) => {
+      cleanData = response;
+    });
+    cleanData.sort(sortBy("id"));
+    cleanData.forEach((user) => {
+      id = +user.id + 1;
     });
     if (
       cleanData.some((data) => {
         return data.Username === newUser.Username;
       })
     ) {
-      toast.error("this userName is taken, please try a new UserName!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast(
+        "this userName is taken, please try a new UserName!",
+        "error"
+      );
       return;
     } else {
-      setDoc(doc(db, "users", id.toString()), { ...newUser, id });
-      toast.success("successfully signed up! you can now login!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
+      SETDOC("users", id, { ...newUser, id }).catch((error) => {
+        CreateToast(error, "error");
+        return;
       });
+      CreateToast("successfully signed up! you can now login!", "success");
+      setShowSignUp(false);
     }
   };
   const signIn = async (e) => {
     e.preventDefault();
-    const srcData = await getDocs(collection(db, "users"));
-    const cleanData = [];
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      cleanData.push(info);
+    let cleanData = [];
+    await GETCOLLECTION("users").then((response) => {
+      cleanData = response;
     });
     if (
       cleanData.some((user) => {
@@ -134,60 +122,37 @@ export default function User(props) {
       });
       if (tempData) {
         tempData.Active = true;
-        await setDoc(doc(db, "users", tempData.id.toString()), {
-          ...tempData,
-        });
+        await SETDOC("users", tempData.id, { ...tempData });
         secureLocalStorage.setItem(
           "activeUser",
           JSON.stringify({ ...tempData })
         );
         window.location.reload();
       } else {
-        toast.error("invalid credentials, try again", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        CreateToast("invalid credentials, try again", "error");
       }
     } else {
-      toast.error("invalid credentials, try again", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("invalid credentials, try again", "error");
     }
   };
 
-  if (user) {
-    useEffect(() => {
-      props.getUser(user.id).then((value) => {
-        value.admin ? setIsAdmin(true) : setIsAdmin(false);
-      });
-    }, []);
-  }
+  GETDOC("users", user.id).then((value) => {
+    value.admin ? setIsAdmin(true) : setIsAdmin(false);
+    setIsLoading(false);
+  });
 
   return (
     <>
       {user ? (
-        IsAdmin ? (
-          <DashBoard
-            Data={props.Data}
-            UpdateUser={props.UpdateUser}
-            UserUpdated={props.UserUpdated}
-            Delete={props.Delete}
-          />
+        isLoading ? (
+          <img
+            style={{ width: "50px", margin: "auto" }}
+            src={loadingDark}
+          ></img>
+        ) : IsAdmin ? (
+          window.location.replace("/Dashboard")
         ) : (
-          <Profile User={user} />
+          !IsAdmin && <Profile />
         )
       ) : (
         <div className="Container ">

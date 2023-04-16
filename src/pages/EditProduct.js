@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import DB from "../DBConfig.json";
 import { initializeApp } from "firebase/app";
-import { collection, getFirestore, getDocs } from "firebase/firestore";
 import {
   getStorage,
   ref,
@@ -12,26 +11,34 @@ import {
 } from "firebase/storage";
 import DeletePhoto from "../assets/delete.png";
 import Error404 from "./Error404";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddPhoto from "../assets/addphoto.png";
 import secureLocalStorage from "react-secure-storage";
+import { CreateToast } from "../App";
+import MyModal from "../components/Modal";
+import {
+  DELETEDOC,
+  GETCOLLECTION,
+  GETDOC,
+  SETDOC,
+  productDistributor,
+} from "../server";
+import loading from "../assets/loading-13.gif";
+
 const app = initializeApp(DB.firebaseConfig);
 const storage = getStorage(app);
-const db = getFirestore(app);
-
-export default function EditProduct(props) {
+export default function EditProduct() {
+  const [inactive, setInactive] = React.useState(false);
   const id = useParams().ID;
   const [Product, setProduct] = React.useState({});
   const [Error, setError] = React.useState(false);
+  const [categories, SetCategories] = React.useState([]);
   const [activeImg, setActiveImg] = React.useState("");
   const validateUser = async () => {
     const activeUser = JSON.parse(secureLocalStorage.getItem("activeUser"));
-    const srcData = await getDocs(collection(db, "users"));
-    const cleanData = [];
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      cleanData.push(info);
+    let cleanData = [];
+    await GETCOLLECTION("users").then((response) => {
+      cleanData = response;
     });
     cleanData.forEach((user) => {
       if (user.Username === activeUser.Username) {
@@ -41,9 +48,18 @@ export default function EditProduct(props) {
       }
     });
   };
+
   useEffect(() => {
-    props.getProduct(id).then((value) => {
-      setProduct(value);
+    const getCate = async () => {
+      await GETCOLLECTION("categories").then((res) => {
+        SetCategories(res);
+      });
+    };
+    getCate();
+  }, []);
+  useEffect(() => {
+    GETDOC("products", id).then((res) => {
+      setProduct(res);
     });
     validateUser();
   }, []);
@@ -90,31 +106,60 @@ export default function EditProduct(props) {
       });
     }
   };
-  const UpdateProduct = (e) => {
+  const Delete = async (e) => {
     e.preventDefault();
-    props.UpdateProduct(id.toString(), Product);
-    toast.success("Product has been updated", {
-      position: "bottom-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    if (confirm("are you sure you want to delete this product?")) {
+      setInactive(true);
+      for (let index = 0; index < Product.images.length; index++) {
+        await deleteObject(
+          ref(storage, `/images/${id}/${Product.images[index].index}`)
+        );
+      }
+      await getDownloadURL(ref(storage, `/images/${id}/thumbnail`)).then(
+        (res) => {
+          if (res) {
+            deleteObject(ref(storage, `/images/${id}/thumbnail`));
+          } else {
+            return;
+          }
+        }
+      );
+      await DELETEDOC("products", id);
+      setInactive(false);
+      alert("product has been deleted");
+      window.location.replace("/User");
+    } else {
+      return;
+    }
+  };
+  const UpdateProduct = async (e) => {
+    e.preventDefault();
+    CreateToast("Updating...", "info");
+    let firstProduct;
+    let SecondProduct;
+    await GETDOC("websiteData", "mainProduct1").then(
+      (res) => (firstProduct = res)
+    );
+
+    await GETDOC("websiteData", "mainProduct2").then(
+      (res) => (SecondProduct = res)
+    );
+
+    if (firstProduct.id == id) {
+      console.log("true");
+      await SETDOC("websiteData", "mainProduct1", { ...Product });
+    }
+    if (SecondProduct.id == id) {
+      await SETDOC("websiteData", "mainProduct2", { ...Product });
+    }
+    await SETDOC("products", id, { ...Product });
+    const productList = await GETCOLLECTION("products");
+    const catagories = await GETCOLLECTION("categories");
+    productDistributor(productList, catagories);
+    CreateToast("Product has been updated", "success");
   };
   const DeleteImg = async (url) => {
-    toast.warning("photo deleting", {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "black",
-    });
+    CreateToast("photo deleting", "warning");
     const targetImg = Product.images.find((imageObject) => {
       if (imageObject.url === url) return imageObject;
     });
@@ -125,95 +170,84 @@ export default function EditProduct(props) {
           const desertRef = ref(storage, `images/${id}/${targetImg.index}`);
           deleteObject(desertRef)
             .then(() => {
-              props.UpdateProduct(id.toString(), Product);
-
-              props.getProduct(id).then((value) => {
+              SETDOC("products", id, { ...Product });
+              GETDOC("products", id).then((value) => {
                 setProduct(value);
               });
-              toast.success("photo has been deleted", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-              });
+              CreateToast("photo has been deleted", "success");
             })
             .catch((error) => {
-              toast.error(
-                "something went wrong,please refresh the page and try again",
-                {
-                  position: "bottom-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "colored",
-                }
-              );
+              CreateToast(error, "error");
             });
         }
       });
     }
+  };
+  const MakeThumb = async (ActiveIMG) => {
+    await SETDOC("products", id, { ...Product, thumbnail: ActiveIMG });
+    CreateToast("changed thumbnail", "success");
   };
   const uploadPhoto = async (event) => {
     const imageRef = ref(
       storage,
       `images/${Product.id}/${Product.images.length}`
     );
-    toast.warning("photo uploading", {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "black",
-    });
+    CreateToast("photo uploading", "warning");
     uploadBytes(imageRef, event.target.files[0]).then(async (snapshot) => {
       console.log("uploaded");
       await getDownloadURL(snapshot.ref).then((url) => {
         Product.images.push({ index: Product.images.length, url: url });
-        props.UpdateProduct(id.toString(), Product);
-        props.getProduct(id).then((value) => {
+        SETDOC("products", id, { ...Product });
+        GETDOC("products", id).then((value) => {
           setProduct(value);
         });
-        toast.success("photo uploaded", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        CreateToast("photo uploaded", "success");
       });
     });
   };
+  const Options = categories.map((category) => {
+    return <option value={category.Name}>{category.Name}</option>;
+  });
   return (
     <>
+      {inactive && (
+        <div className="Inactive">
+          <img src={loading} />
+        </div>
+      )}
       {Error ? (
         <Error404 />
       ) : (
         <div className="EditProduct">
+          <button
+            onClick={() => {
+              window.location.replace("/Dashboard");
+            }}
+          >
+            Go Back
+          </button>
           <div className="Images">
             <div style={{ position: "relative" }}>
               <img src={activeImg ? activeImg : ""} className="MainIMG"></img>
               {activeImg && (
-                <button
-                  className="DeleteBtn"
-                  onClick={() => {
-                    DeleteImg(activeImg);
-                  }}
-                >
-                  <img src={DeletePhoto}></img>
-                </button>
+                <div className="ButtonWrapper">
+                  <button
+                    className="Delete"
+                    onClick={() => {
+                      DeleteImg(activeImg);
+                    }}
+                  >
+                    Delete Photo
+                  </button>
+                  <button
+                    className="Thumbnail"
+                    onClick={() => {
+                      MakeThumb(activeImg);
+                    }}
+                  >
+                    Make Thumbnail
+                  </button>
+                </div>
               )}
             </div>
             <div className="ThumbPhotos">
@@ -231,8 +265,8 @@ export default function EditProduct(props) {
             </div>
           </div>
           <form className="ProductInfo">
-            <div class="form-group" id="Title">
-              <label for="title">Title:</label>
+            <div className="form-group" id="Title">
+              <label htmlFor="title">Title:</label>
               <input
                 value={Product.title}
                 type="text"
@@ -242,8 +276,8 @@ export default function EditProduct(props) {
                 onChange={handleInput}
               />
             </div>
-            <div class="form-group" id="Brand">
-              <label for="brand">Brand:</label>
+            <div className="form-group" id="Brand">
+              <label htmlFor="brand">Brand:</label>
               <input
                 value={Product.brand}
                 type="text"
@@ -253,8 +287,8 @@ export default function EditProduct(props) {
                 onChange={handleInput}
               />
             </div>
-            <div class="form-group" id="Category">
-              <label for="category">Category:</label>
+            <div className="form-group" id="Category">
+              <label htmlFor="category">Category:</label>
               <select
                 id="category"
                 name="category"
@@ -264,16 +298,12 @@ export default function EditProduct(props) {
                 style={{ color: "white", backgroundColor: "black" }}
               >
                 <option value="">--Please select a category--</option>
-                <option value="smartphones">smartphones</option>
-                <option value="Tv">Tv</option>
-                <option value="Monitor">Monitor</option>
-                <option value="laptops">laptops</option>
-                <option value="watches">watches</option>
+                {Options}
               </select>
             </div>
 
-            <div class="form-group" id="Description">
-              <label for="description">Description:</label>
+            <div className="form-group" id="Description">
+              <label htmlFor="description">Description:</label>
               <textarea
                 value={Product.description}
                 id="description"
@@ -283,8 +313,8 @@ export default function EditProduct(props) {
               ></textarea>
             </div>
 
-            <div class="form-group" id="Stock">
-              <label for="stock">Stock:</label>
+            <div className="form-group" id="Stock">
+              <label htmlFor="stock">Stock:</label>
               <input
                 value={Product.stock}
                 type="number"
@@ -294,11 +324,11 @@ export default function EditProduct(props) {
                 required
                 onChange={handleInput}
               />
-              <p style={{ textAlign: "center" }}>(increase to add Stock)</p>
+              <p>(increase to add Stock)</p>
             </div>
 
-            <div class="form-group" id="Offer">
-              <label for="Offer">Offer?</label>
+            <div className="form-group" id="Offer">
+              <label htmlFor="Offer">Offer?</label>
               <input
                 checked={Product.Offer}
                 type="checkbox"
@@ -309,24 +339,22 @@ export default function EditProduct(props) {
             </div>
 
             {Product.Offer && (
-              <div class="form-group" id="Discount">
-                <label for="discount">Discount:</label>
+              <div className="form-group" id="Discount">
+                <label htmlFor="discount">Discount:</label>
                 <input
                   value={Product.discountPercentage}
                   type="number"
                   id="discount"
-                  name="discount"
+                  name="discountPercentage"
                   min="0"
                   max="100"
                   onChange={handleInput}
                 />
-                <p style={{ textAlign: "center" }}>
-                  (calculated by Percentage)
-                </p>
+                <p>(calculated by Percentage)</p>
               </div>
             )}
-            <div class="form-group" id="Cost">
-              <label for="cost">Cost:</label>
+            <div className="form-group" id="Cost">
+              <label htmlFor="cost">Cost:</label>
               <input
                 value={Product.cost}
                 type="number"
@@ -338,8 +366,8 @@ export default function EditProduct(props) {
               />
             </div>
 
-            <div class="form-group" id="Price">
-              <label for="price">Selling Price:</label>
+            <div className="form-group" id="Price">
+              <label htmlFor="price">Selling Price:</label>
               <input
                 value={Product.price}
                 type="number"
@@ -352,8 +380,8 @@ export default function EditProduct(props) {
               />
             </div>
 
-            <div class="form-group" id="Hot-product">
-              <label for="HotProduct">Hot Product?</label>
+            <div className="form-group" id="Hot-product">
+              <label htmlFor="HotProduct">Hot Product?</label>
               <input
                 checked={Product.HotProduct}
                 type="checkbox"
@@ -362,7 +390,6 @@ export default function EditProduct(props) {
                 onChange={handleInput}
               />
             </div>
-
             <input
               type="submit"
               value="Save"
@@ -371,9 +398,39 @@ export default function EditProduct(props) {
                 UpdateProduct(e);
               }}
             />
+            <button
+              className="btn btn-danger"
+              id="Delete"
+              onClick={(e) => {
+                Delete(e);
+              }}
+            >
+              Delete Product
+            </button>
           </form>
+          <div className="Section2">
+            <h3>Additional Info</h3>
+            <div className="OtherInfo">
+              <p>Stars Got: {Product.Stars}</p>
+              <p>Total Rating Got: {Product.rating}</p>
+              <p>
+                Number of Users Rated :{" "}
+                {Product.UsersRated ? Product.UsersRated.length : ""}
+              </p>
+              <p>Amount of Times Sold : {Product.Sold}</p>
+            </div>
+          </div>
         </div>
       )}
     </>
   );
 }
+/*
+{
+    "Stars": 5,
+    "rating": 5,
+    "UsersRated": [
+        "marco13"
+    ]
+}
+*/

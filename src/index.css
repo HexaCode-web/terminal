@@ -194,6 +194,17 @@ NAVBAR
 }
 /*
 =============
+CONTENT PAGE
+===========
+*/
+.reviewWrapper {
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+/*
+=============
 ADD ITEM
 ===========
 */
@@ -300,7 +311,8 @@ h1 {
   position: relative;
   margin: 30px auto;
   width: 95vw;
-  height: 80vh;
+  min-height: 450px;
+  height: 450px;
 }
 .HeaderContent {
   flex-direction: column;
@@ -371,6 +383,8 @@ PRODUCT PREVIEW
   margin: 0 15px;
   width: 45%;
   display: flex;
+  min-height: 600px;
+  max-height: 600px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -793,11 +807,18 @@ h1 {
   align-items: center;
 }
 .Container .formItem,
-.AddAdmin-form .formItem {
+.AddAdmin-form .formItem,
+.AddCate .formItem {
+  margin: 20px 0;
   display: flex;
   gap: 10px;
   flex-direction: column;
   transition: 0.5s all;
+}
+.AddCate .formItem {
+  width: 100%;
+  align-items: center;
+  flex-direction: row;
 }
 .Container input {
   color: white;
@@ -912,7 +933,7 @@ h1 {
   right: 20px;
   top: 70px;
   z-index: 10;
-  width: 300px;
+  width: 400px;
   min-height: fit-content;
   max-height: 60vh;
   border: 1px solid#ee233a;
@@ -930,12 +951,28 @@ h1 {
 .CartMini .ProductCart {
   border-bottom: 1px solid #ee233a;
   margin: 10px 0;
-  padding: 0 10px;
+  padding: 15px;
   gap: 10px;
   height: 100px;
   display: flex;
   align-items: center;
   border-radius: 30px;
+}
+.CartMini .Loading {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+.CartMini .Loading img {
+  width: 0px;
+  height: 100px;
+}
+.CartMini .ProductCart .PriceDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .CartMini .ProductCartDetails {
   width: 55%;
@@ -1184,6 +1221,7 @@ h1 {
   margin: auto;
   overflow-x: auto;
 }
+
 .AddAdmin-form {
   display: flex;
   flex-direction: column;
@@ -1193,8 +1231,16 @@ h1 {
   margin: auto;
 }
 .Users button {
-  color: white !important;
-  border: 1.5px solid #ed1a4e !important;
+  border-radius: 5px;
+  color: white;
+  border: 1px solid #9b1e2b;
+}
+.Users .Danger {
+  border: 1px solid #9b1e2b;
+}
+.Users .Danger:hover {
+  background-color: #d9534f;
+  border-radius: 5px;
 }
 /*
 ========================================= 
@@ -1205,6 +1251,19 @@ h1 {
 .Products .Add {
   margin: auto;
   width: 20%;
+  border: none !important;
+}
+.Products button:hover {
+  background-color: #0275d8;
+  scale: 1.05;
+}
+.Products button {
+  border: none;
+  color: white;
+  border-radius: 5px;
+}
+.LowStock {
+  color: red !important;
 }
 /*
 ========================================= 
@@ -1215,10 +1274,11 @@ h1 {
 .EditProduct form {
   display: grid;
   gap: 50px;
-  max-width: 1000px;
-  margin: 20px;
-  align-items: center;
-  justify-items: center;
+  margin: 30px auto;
+  padding: 20px 0;
+  border-radius: 15px;
+  place-items: center;
+  width: 80%;
   grid-template-areas:
     "Fname Lname"
     "Username Phone"
@@ -1226,6 +1286,27 @@ h1 {
     "Address  Address"
     "Gender DOB"
     "Save Save";
+}
+.EditProduct button {
+  margin-top: 20px;
+  margin-left: 10px;
+}
+.EditProduct .Section2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.EditProduct .Section2 .OtherInfo {
+  padding: 20px 0;
+  margin: 30px 0;
+  border: 1px solid white;
+  border-radius: 15px;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  width: 80%;
+  place-items: center;
 }
 .General #Fname {
   grid-area: Fname;
@@ -1393,7 +1474,7 @@ h1 {
     "Offer  Discount"
     "Cost Price"
     "Hot-product Hot-product"
-    "Submit Submit";
+    "Submit Delete";
 }
 .EditProduct #Title {
   grid-area: Title;
@@ -1408,7 +1489,15 @@ h1 {
   grid-area: Description;
 }
 .EditProduct #Stock {
+  position: relative;
   grid-area: Stock;
+}
+.EditProduct #Stock p,
+.EditProduct #Discount p {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .EditProduct #Offer {
   display: flex;
@@ -1418,6 +1507,7 @@ h1 {
   grid-area: Offer;
 }
 .EditProduct #Discount {
+  position: relative;
   grid-area: Discount;
 }
 .EditProduct #Cost {
@@ -1429,6 +1519,9 @@ h1 {
 }
 .EditProduct #Submit {
   grid-area: Submit;
+}
+.EditProduct #Delete {
+  grid-area: Delete;
 }
 .EditProduct #Hot-product {
   display: flex;
@@ -1467,30 +1560,41 @@ h1 {
   width: 60%;
   height: 60%;
 }
-.EditProduct .DeleteBtn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: transparent;
-  border: none;
+.EditProduct .ButtonWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.EditProduct .Delete {
+  width: fit-content;
+}
+.EditProduct .Thumbnail:hover {
+  background-color: #0275d8;
+  border-radius: 5px;
+}
+.EditProduct .Delete:hover {
+  background-color: #d9534f;
+  border-radius: 5px;
 }
 /*
 ========================================= 
                 Categories  Page
 =========================================
 */
+.Categories button:hover {
+  background-color: #0275d8;
+  scale: 1.05;
+}
+
 .Categories button {
-  color: white !important;
-  border: 1.5px solid #ed1a4e !important;
+  border-radius: 5px;
+  color: white;
+  border: 1px solid #9b1e2b;
 }
 .Categories label {
   color: black;
 }
-.Categories .btn {
-  min-width: 60px;
-  border: 1px solid black;
-  color: black !important;
-}
+
 .Categories .Modal {
   width: fit-content;
   margin: auto;
@@ -1501,4 +1605,65 @@ h1 {
 }
 .Categories .table img {
   max-width: 200px;
+}
+.Categories .Danger {
+  border: 1px solid #9b1e2b;
+}
+.Categories .Danger:hover {
+  background-color: #d9534f;
+  border-radius: 5px;
+}
+.Cate .EditCate {
+  width: 60%;
+  margin: auto;
+  height: fit-content;
+  border: 1px solid white;
+  border-radius: 20px;
+  margin-bottom: 40px;
+}
+.Cate .EditCate form .formItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.Cate button,
+.EditProduct button {
+  border: 1px solid green;
+  color: white;
+  border-radius: 5px;
+}
+.Cate h3 {
+  margin-top: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.Cate .EditCate form .formItem input {
+  min-height: 40px;
+}
+.Cate .EditCate form .formItem:nth-of-type(1) {
+  grid-area: name;
+}
+.Cate .EditCate form .formItem:nth-of-type(2) {
+  grid-area: color;
+}
+.Cate .EditCate form .formItem:nth-of-type(3) {
+  grid-area: image;
+}
+.Cate .EditCate form .formItem:nth-of-type(4) {
+  grid-area: button;
+  margin-top: 0;
+  width: 100%;
+  display: flex;
+}
+.Cate .EditCate form .formItem:nth-of-type(4) input {
+  width: fit-content;
+  margin: auto;
+}
+.Cate .EditCate form {
+  padding: 0;
+  gap: 30px;
+  border: none;
+  display: grid;
+  grid-template-areas: "name color" "image image" "button button";
 }

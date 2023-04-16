@@ -1,9 +1,9 @@
 import React from "react";
-import MyModal from "../components/Modal";
+import MyModal from "./Modal";
 import secureLocalStorage from "react-secure-storage";
-
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CreateToast } from "../App";
+import { DELETEDOC } from "../server";
 export default function Settings(props) {
   const [activePage, setActivePage] = React.useState("General");
   const [ShowChangePassword, setShowChangePassword] = React.useState(false);
@@ -36,22 +36,13 @@ export default function Settings(props) {
     if (changePass.verifyPass === changePass.oldPass) {
       props.UpdateUser(null, true, changePass.newPass);
     } else {
-      toast.error("Old Password doesn't match your password", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("Old Password doesn't match your password", "error");
     }
   };
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const handlePrimaryAction = async (e) => {
-    await props.Delete("users", ActiveUser.id);
+    await DELETEDOC("users", ActiveUser.id);
     setShowModal(false);
     secureLocalStorage.clear();
     setTimeout(() => {
@@ -61,18 +52,7 @@ export default function Settings(props) {
 
   return (
     <>
-      {props.UserUpdated &&
-        toast.success("Updated your info!", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        })}
-
+      {props.UserUpdated && CreateToast("Updated your info!", "success")}
       <div className="Dashboard">
         <div className="SideBar">
           <ul className="BTNList">
@@ -100,7 +80,7 @@ export default function Settings(props) {
               <h1>General info</h1>
               <form>
                 <div id="Fname">
-                  <label for="first-name">First Name:</label>
+                  <label htmlFor="first-name">First Name:</label>
                   <input
                     type="text"
                     id="first-name"
@@ -110,7 +90,7 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Lname">
-                  <label for="last-name">Last Name:</label>
+                  <label htmlFor="last-name">Last Name:</label>
                   <input
                     type="text"
                     id="last-name"
@@ -120,7 +100,7 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Username">
-                  <label for="username">Username:</label>
+                  <label htmlFor="username">Username:</label>
                   <input
                     type="text"
                     id="username"
@@ -130,7 +110,7 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Phone">
-                  <label for="phone">Phone Number:</label>
+                  <label htmlFor="phone">Phone Number:</label>
                   <input
                     type="tel"
                     id="phone"
@@ -140,7 +120,7 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Email">
-                  <label for="email">Email:</label>
+                  <label htmlFor="email">Email:</label>
                   <input
                     type="email"
                     id="email"
@@ -150,7 +130,7 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Address">
-                  <label for="address">Address:</label>
+                  <label htmlFor="address">Address:</label>
                   <input
                     type="text"
                     id="address"
@@ -160,14 +140,14 @@ export default function Settings(props) {
                   />
                 </div>
                 <div id="Gender">
-                  <label for="gender">Gender:</label>
+                  <label htmlFor="gender">Gender:</label>
                   <select
                     id="gender"
                     name="gender"
-                    value={ActiveUser.gender}
+                    defaultValue={ActiveUser.gender}
                     onChange={handleInput}
                   >
-                    <option value="" selected disabled>
+                    <option value="" disabled>
                       Select your gender
                     </option>
                     <option value="male">Male</option>
@@ -175,7 +155,7 @@ export default function Settings(props) {
                   </select>
                 </div>
                 <div id="DOB">
-                  <label for="birthdate">Date of Birth:</label>
+                  <label htmlFor="birthdate">Date of Birth:</label>
                   <input
                     type="date"
                     id="birthdate"

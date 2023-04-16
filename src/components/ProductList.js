@@ -1,17 +1,22 @@
 /* eslint-disable array-callback-return */
 import React, { useEffect } from "react";
-import Card from "../components/Card";
+import Card from "./Card";
 import { useParams } from "react-router-dom";
 
 export default function ProductList(props) {
+  console.log(props);
   const id = useParams().ID;
-  const targetData = props.List[id];
-  const [categoryData, setCategoryData] = React.useState(targetData);
+  const Target = props.List.find((category) => {
+    if (category.Name == id) {
+      return category;
+    }
+  });
+  const [categoryData, setCategoryData] = React.useState(Target.products);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filteredData, setFilteredData] = React.useState([]);
   useEffect(() => {
-    setCategoryData(targetData);
-  }, [targetData]);
+    setCategoryData(Target.products);
+  }, [Target]);
   const brandList = [
     ...new Set(
       categoryData.map((product) => {
@@ -22,7 +27,7 @@ export default function ProductList(props) {
 
   const SortBrand = (brand) => {
     if (brand === "All") {
-      setCategoryData(targetData);
+      setCategoryData(Target.products);
       return;
     }
     setCategoryData(
@@ -47,6 +52,7 @@ export default function ProductList(props) {
       })
     );
   };
+
   return (
     <>
       {categoryData ? (

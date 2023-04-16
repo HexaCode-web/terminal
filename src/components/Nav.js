@@ -1,38 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../assets/logo2.png";
 import Logout from "../assets/logout.png";
-import { initializeApp } from "firebase/app";
-import {
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  getFirestore,
-} from "firebase/firestore";
-import DB from "../DBConfig.json";
-
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import secureLocalStorage from "react-secure-storage";
-
-const app = initializeApp(DB.firebaseConfig);
-const db = getFirestore(app);
+import { CreateToast } from "../App";
+import { GETCOLLECTION, GETDOC, SETDOC } from "../server";
 export default function Nav(props) {
+  const [CartCount, setCartCount] = React.useState();
+  useEffect(() => {
+    GETDOC("users", props.activeUser.id).then((user) =>
+      setCartCount(user.CartCount)
+    );
+  }, [props.UpdateCart]);
   const [showSearch, setShowSearch] = useState(false);
   const ClearActive = async () => {
-    const srcData = await getDocs(collection(db, "users"));
-    const cleanData = [];
-    srcData.forEach((doc) => {
-      const info = doc.data();
-      cleanData.push(info);
+    let cleanData = [];
+    await GETCOLLECTION("users").then((response) => {
+      cleanData = response;
     });
     cleanData.forEach((User) => {
       if (User.Username === props.activeUser.Username) {
         User.Active = false;
       }
-      setDoc(doc(db, "users", User.id.toString()), {
-        ...User,
-      });
+      SETDOC("users", User.id, { ...User });
     });
   };
   const logOut = async () => {
@@ -56,7 +45,9 @@ export default function Nav(props) {
               type="text"
               className="search"
               name="search"
-              onChange={props.Search}
+              onChange={() => {
+                props.handleSearch(event);
+              }}
             />
             <span className="item itemFour"></span>
           </div>
@@ -76,8 +67,8 @@ export default function Nav(props) {
             ) : (
               <>
                 <div style={{ position: "relative" }}>
-                  {props.CartAmount > 0 ? (
-                    <div className="CartCounter">{props.CartAmount}</div>
+                  {CartCount > 0 ? (
+                    <div className="CartCounter">{CartCount}</div>
                   ) : (
                     ""
                   )}
@@ -89,16 +80,7 @@ export default function Nav(props) {
                     onClick={() => {
                       props.activeUser
                         ? props.setShowCart((prev) => !prev)
-                        : toast.error("You Aren't Signed in!", {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                          });
+                        : CreateToast("You Aren't Signed in!", "error");
                     }}
                   ></div>
                 </div>

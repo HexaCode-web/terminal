@@ -1,8 +1,5 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect } from "react";
-import DB from "../DBConfig.json";
-import { initializeApp } from "firebase/app";
-import { getFirestore, setDoc, getDoc, doc } from "firebase/firestore";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper";
@@ -16,16 +13,12 @@ import Star from "../assets/star-empty.png";
 import StarB from "../assets/star-black.png";
 import starFilled from "../assets/star-filled.png";
 import loading from "../assets/loading-13.gif";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { v4 as uid } from "uuid";
 import secureLocalStorage from "react-secure-storage";
-
-const app = initializeApp(DB.firebaseConfig);
-const db = getFirestore(app);
+import { CreateToast } from "../App";
+import { GETDOC, SETDOC } from "../server";
 export default function ProductDetails(props) {
-  const [activeUser] = React.useState(
-    JSON.parse(secureLocalStorage.getItem("activeUser")) || ""
-  );
+  const [activeUser, setActiveUser] = React.useState({});
   const [inactive, setInactive] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [addedNum, setAddedNum] = React.useState(0);
@@ -34,23 +27,24 @@ export default function ProductDetails(props) {
   const [mainPhoto, setMainPhoto] = React.useState("");
   const [Rating, setRating] = React.useState(0);
   const [UserRated, setUserRated] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const id = useParams().ID;
-  const getProduct = async () => {
-    const docRef = doc(db, "products", id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setProduct(docSnap.data());
-    } else {
-      setError(true);
-    }
-  };
 
+  const getProductAndUser = async () => {
+    setIsLoading(true);
+    await GETDOC("products", id).then((value) => {
+      value !== "Error" ? setProduct(value) : setError(true);
+    });
+    JSON.parse(secureLocalStorage.getItem("activeUser")).admin
+      ? setIsAdmin(true)
+      : setIsAdmin(false);
+    setIsLoading(false);
+  };
   const UpdateStatics = async (target, action) => {
     let tempData;
-    const docSnap = await getDoc(doc(db, "statistics", "0"));
-    if (docSnap.exists()) {
-      tempData = docSnap.data();
-    }
+    await GETDOC("statistics", "0").then((value) => {
+      value ? (tempData = value) : "";
+    });
     if (target === "wish" && action === "add") {
       tempData = { ...tempData, WishNum: tempData.WishNum + 1 };
     }
@@ -63,79 +57,44 @@ export default function ProductDetails(props) {
     if (target === "cart" && action === "remove") {
       tempData = { ...tempData, CartNum: tempData.CartNum - 1 };
     }
-    setDoc(doc(db, "statistics", "0"), tempData);
+    await SETDOC("statistics", "0", tempData);
   };
   const UpdateCart = async (item) => {
+    const Price = item.Offer
+      ? item.price - (item.price * item.discountPercentage) / 100
+      : item.price;
     if (!activeUser) {
-      toast.error("you aren't signed in!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("you aren't signed in!", "error");
       return;
     } else {
       if (!Product.stock) {
-        toast.error("Sorry! we are out of stock!", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        CreateToast("Sorry! we are out of stock!", "error");
         return;
       }
       setInactive(true);
+      props.setShowCart(false);
+      let newAR = activeUser.cart;
+      newAR.push(item);
+      setActiveUser((prev) => {
+        return {
+          ...prev,
+          CartCount: prev.CartCount + 1,
+          cart: newAR,
+        };
+      });
       await UpdateStatics("cart", "add");
       setAddedNum((prev) => prev + 1);
       addedNum === 0
-        ? toast.success("added to the Cart!", {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          })
-        : toast.success(`added to the Cart ${addedNum} times`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-          });
-      activeUser.cart.push(item);
-      props.setCartAmount(activeUser.cart.length);
-      secureLocalStorage.setItem("activeUser", JSON.stringify(activeUser));
-      props.updateUser(activeUser);
+        ? CreateToast("added to the Cart!", "success")
+        : CreateToast(`added to the Cart ${addedNum + 1} times`, "success");
     }
+    props.setUpdateCart((prev) => prev + 1);
     setInactive(false);
+    props.setShowCart(true);
   };
-
   const UpdateWishList = async (item) => {
     if (!activeUser) {
-      toast.error("you aren't signed in!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("you aren't signed in!", "error");
       return;
     } else {
       setInactive(true);
@@ -152,43 +111,35 @@ export default function ProductDetails(props) {
       ) {
         await UpdateStatics("wish", "remove");
         activeUser.wishlist.splice(targetProductPlace, 1);
-        secureLocalStorage.setItem("activeUser", JSON.stringify(activeUser));
+
         props.updateUser(activeUser);
-        toast.info("removed from wishlist", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        CreateToast("removed from wishlist", "info");
       } else {
         UpdateStatics("wish", "add");
-        toast.success("added to the wishlist!", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+        CreateToast("added to the wishlist!", "success");
         activeUser.wishlist.push(item);
-        secureLocalStorage.setItem("activeUser", JSON.stringify(activeUser));
         props.updateUser(activeUser);
       }
       setInactive(false);
     }
   };
-
   useEffect(() => {
-    getProduct();
-    props.getUser(activeUser.id).then((value) => {
-      value.admin ? setIsAdmin(true) : setIsAdmin(false);
+    if (Object.keys(activeUser) != 0) {
+      SETDOC("users", activeUser.id, {
+        ...activeUser,
+      });
+    }
+  }, [activeUser]);
+  useEffect(() => {
+    GETDOC(
+      "users",
+      JSON.parse(secureLocalStorage.getItem("activeUser")).id
+    ).then((res) => {
+      setActiveUser(res);
     });
+  }, [props.UpdateCart]);
+  useEffect(() => {
+    getProductAndUser();
   }, []);
   useEffect(() => {
     setMainPhoto(Product.images ? Product.images[0].url : "");
@@ -209,27 +160,22 @@ export default function ProductDetails(props) {
   };
   const NewProducts = props.Items.map((productItem) => {
     if (productItem.category === Product.category) {
-      return (
-        <SwiperSlide>
-          <Card key={productItem.id} product={productItem} />
-        </SwiperSlide>
-      );
+      if (productItem.title === Product.title) {
+        return;
+      } else {
+        return (
+          <SwiperSlide key={uid()}>
+            <Card product={productItem} />
+          </SwiperSlide>
+        );
+      }
     } else {
       return;
     }
   });
   const SendRate = async () => {
     if (!activeUser) {
-      toast.error("you aren't signed in!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      CreateToast("you aren't signed in!", "error");
       return;
     } else {
       setInactive(true);
@@ -251,25 +197,14 @@ export default function ProductDetails(props) {
         ...oldData,
         rating: oldData.Stars / oldData.UsersRated.length,
       };
-      const docRef = doc(db, "products", id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        await setDoc(doc(db, "products", id.toString()), NewData);
-        setInactive(false);
-        alert("your rating has been submitted! please reload the page");
+      try {
+        await SETDOC("products", id, { ...NewData });
+        CreateToast("your changes have been saved", "success");
         window.location.reload();
-      } else {
         setInactive(false);
-        toast.error("something went wrong", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+      } catch (error) {
+        CreateToast("something went wrong", "error");
+        setInactive(false);
       }
     }
   };
@@ -279,6 +214,7 @@ export default function ProductDetails(props) {
           <button
             className={`thumb ${mainPhoto === photo ? "active" : ""}`}
             onClick={setMainImage}
+            key={uid()}
           >
             <img src={photo.url} />
           </button>
@@ -297,7 +233,7 @@ export default function ProductDetails(props) {
       )}
       {Error ? (
         <Error404 />
-      ) : Product.price ? (
+      ) : !isLoading ? (
         <div>
           <div className="Details">
             <div className="left">
@@ -380,7 +316,9 @@ export default function ProductDetails(props) {
                   <button
                     className={`cart ${Product.stock ? "" : "button-inactive"}`}
                     onClick={() => {
-                      window.location.replace(`/User/Product/${Product.id}`);
+                      window.location.replace(
+                        `/Dashboard/Product/${Product.id}`
+                      );
                     }}
                   >
                     Edit Product / Add Stock

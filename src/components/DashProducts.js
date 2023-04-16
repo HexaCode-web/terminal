@@ -1,12 +1,12 @@
 import { React, useState, useEffect } from "react";
 import { initializeApp } from "firebase/app";
-import { doc, setDoc, getFirestore } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import loadingLight from "../assets/loading.gif";
 import DB from "../DBConfig.json";
 import sortBy from "sort-by";
+import { SETDOC, productDistributor, GETCOLLECTION } from "../server";
+import { CreateToast } from "../App";
 const app = initializeApp(DB.firebaseConfig);
-const db = getFirestore(app);
 const storage = getStorage(app);
 
 export default function Products(props) {
@@ -32,8 +32,9 @@ export default function Products(props) {
   const [status, setStatus] = useState(false);
   props.Data.sort(sortBy("id"));
   const handleInput = (event) => {
+    console.log(newProduct);
     props.Data.forEach((product) => {
-      id = product.id + 1;
+      id = +product.id + 1;
     });
     let { name, value, type } = event.target;
     if (type === "number") {
@@ -41,9 +42,11 @@ export default function Products(props) {
     }
     let filesAR = [];
     if (name === "thumbnail") {
+      CreateToast("uploading thumbnail", "progress");
       const imageRef = ref(storage, `images/${newProduct.id}/thumbnail`);
       uploadBytes(imageRef, event.target.files[0]).then(async (snapshot) => {
         console.log("uploaded");
+        CreateToast("uploaded the thumbnail", "success");
         await getDownloadURL(snapshot.ref).then((url) => {
           setNewProduct((prev) => {
             return { ...prev, id: id, thumbnail: url };
@@ -62,6 +65,7 @@ export default function Products(props) {
             urlList.push({ index, url });
             if (urlList.length === filesAR.length) {
               setUrlDone("true");
+              CreateToast("uploaded photos", "success");
             }
             setNewProduct((prev) => {
               return { ...prev, id: id, images: urlList };
@@ -97,7 +101,8 @@ export default function Products(props) {
 
   const add = async (e) => {
     e.preventDefault();
-    await setDoc(doc(db, "products", newProduct.id.toString()), newProduct);
+    await SETDOC("products", newProduct.id, { ...newProduct }, true);
+
     window.location.reload();
   };
   useEffect(() => {
@@ -124,41 +129,6 @@ export default function Products(props) {
     }
   }, [urlDone]);
 
-  const productListEL = props.ProductData.map((Product) => {
-    const discount = Math.round(
-      Product.price - (Product.price * Product.discountPercentage) / 100
-    );
-    return (
-      <tr>
-        <th scope="row" className="d-none">
-          {Product.id}
-        </th>
-        <td>{Product.title}</td>
-        <td>{Product.brand}</td>
-        <td>{Product.category}</td>
-        <td>{Product.Offer ? "YES" : "NO"}</td>
-        <td>{Product.HotProduct ? "Yes" : "NO"}</td>
-        <td>{Product.cost}$</td>
-        <td>{Product.price}$</td>
-        <td>{Product.discountPercentage}%</td>
-        <td>{discount}$</td>
-        <td>{Product.stock}</td>
-        <td>{Product.rating}</td>
-        <td>{Product.Stars}</td>
-        <td>{Product.UsersRated ? Product.UsersRated.length : 0}</td>
-        <td>
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              window.location.replace(`User/product/${Product.id}`);
-            }}
-          >
-            Details
-          </button>
-        </td>
-      </tr>
-    );
-  });
   const catagoriesSelect = props.catagories.map((catagory) => {
     return <option value={catagory.Name}>{catagory.Name}</option>;
   });
@@ -177,7 +147,7 @@ export default function Products(props) {
         Hint: scroll the table with Shift + scroll wheel
       </span>
       <div className="table-responsive">
-        <table class="table table-dark table-striped text-center">
+        <table class="table table-dark table-striped text-center align-middle">
           <thead>
             <tr>
               <th scope="col">Name</th>
@@ -190,13 +160,46 @@ export default function Products(props) {
               <th scope="col">discountPercentage</th>
               <th scope="col">price After Discount</th>
               <th scope="col">stock</th>
-              <th scope="col">rating</th>
-              <th scope="col">Stars Got</th>
-              <th scope="col">Users Rated</th>
               <th scope="col">View Product Details</th>
             </tr>
           </thead>
-          <tbody>{productListEL}</tbody>
+          <tbody>
+            {props.ProductData.map((Product) => {
+              const Low = Product.stock < 5 ? "LowStock" : "";
+              const discount = Math.round(
+                Product.price -
+                  (Product.price * Product.discountPercentage) / 100
+              );
+              return (
+                <tr key={Product.id}>
+                  <th scope="row" className="d-none">
+                    {Product.id}
+                  </th>
+                  <td>{Product.title}</td>
+                  <td>{Product.brand}</td>
+                  <td>{Product.category}</td>
+                  <td>{Product.Offer ? "YES" : "NO"}</td>
+                  <td>{Product.HotProduct ? "YES" : "NO"}</td>
+                  <td>{Product.cost}$</td>
+                  <td>{Product.price}$</td>
+                  <td>{Product.discountPercentage}%</td>
+                  <td>{discount}$</td>
+                  <td className={Low}>{Product.stock}</td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        window.location.replace(
+                          `/Dashboard/product/${Product.id}`
+                        );
+                      }}
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
       <div

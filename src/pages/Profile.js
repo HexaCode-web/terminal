@@ -4,81 +4,90 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper";
 import "swiper/css/pagination";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-export default function Profile(props) {
+import { CreateToast } from "../App";
+import { v4 as uuid } from "uuid";
+import { GETDOC } from "../server";
+import secureLocalStorage from "react-secure-storage";
+export default function Profile() {
+  const [activeUser, setActiveUser] = React.useState(
+    JSON.parse(secureLocalStorage.getItem("activeUser"))
+  );
   let WishListPrice = 0;
   let CartPrice = 0;
   let TotalSpent = 0;
-  const History = props.User.history.map((product) => {
+  const History = activeUser.history?.map((product) => {
     TotalSpent += parseInt(
-      Math.round(
-        product.price - (product.price * product.discountPercentage) / 100
-      )
+      product.price - (product.price * product.discountPercentage) / 100
     );
   });
   let greeting;
   if (new Date().getHours() < 12) greeting = "Good morning";
   else if (new Date().getHours() < 18) greeting = "Good afternoon";
   else greeting = "Good evening";
-  const cartEL = props.User?.cart.map((item) => {
+  const cartEL = activeUser.cart?.map((item) => {
     CartPrice += parseInt(
-      Math.round(item.price - (item.price * item.discountPercentage) / 100)
+      item.price - (item.price * item.discountPercentage) / 100
     );
     return (
-      <SwiperSlide>
-        <Card key={item.id} product={item} />
+      <SwiperSlide key={uuid()}>
+        <Card product={item} />
       </SwiperSlide>
     );
   });
-  const WishListEL = props.User?.wishlist.map((wish) => {
+  const WishListEL = activeUser.wishlist?.map((wish) => {
     WishListPrice += parseInt(
-      Math.round(wish.price - (wish.price * wish.discountPercentage) / 100)
+      wish.price - (wish.price * wish.discountPercentage) / 100
     );
     return (
-      <SwiperSlide>
-        <Card key={wish.id} product={wish} />
+      <SwiperSlide key={uuid()}>
+        <Card product={wish} />
       </SwiperSlide>
     );
-  });
-  const vals = Object.keys(props.User).map(function (key) {
-    return props.User[key];
   });
 
-  const CheckInfo = () => {
+  const FetchUser = async (id) => {
+    await GETDOC("users", id).then((res) => {
+      setActiveUser(res);
+    });
+  };
+  const CheckInfo = (res) => {
+    const vals = Object.keys(res).map(function (key) {
+      return res[key];
+    });
     for (let index = 0; index < vals.length; index++) {
       if (typeof vals[index] !== "boolean") {
-        if (typeof vals[index] !== "object") {
-          if (!vals[index]) {
-            toast.warn(
-              `your Profile is incomplete! go to ${
-                props.User.admin ? "Admin Profile" : "settings"
-              } to complete it`,
-              {
-                position: "bottom-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-              }
-            );
-            return;
+        if (typeof vals[index] !== "object")
+          if (vals[index] !== 0) {
+            if (!vals[index]) {
+              CreateToast(
+                `your Profile is incomplete! go to ${
+                  res.admin ? "Admin Profile" : "settings"
+                } to complete it`,
+                "warn"
+              );
+              return;
+            }
           }
-        }
       }
     }
   };
   useEffect(() => {
-    CheckInfo();
+    const checkData = async () => {
+      let fetchedData = {};
+      GETDOC("users", activeUser.id).then((res) => {
+        fetchedData = res;
+        setActiveUser(res);
+        CheckInfo(fetchedData);
+      });
+    };
+    checkData();
   }, []);
+
   return (
     <div className="Profile">
       <h2 className="animate__animated animate__fadeInDown">
-        {greeting}: {props.User.Fname} {props.User.Lname}
+        {greeting}: {activeUser.Fname} {activeUser.Lname}
       </h2>
       <div className="Card-wrapper">
         <div className="Card Cart animate__animated animate__backInDown">
@@ -125,7 +134,7 @@ export default function Profile(props) {
           className="animate__animated animate__fadeInDown"
           style={{ animationDelay: "1s" }}
         >
-          Total Spent : {TotalSpent}$
+          Total Spent : {TotalSpent.toFixed(2)}$
         </p>
         <p
           className="animate__animated animate__fadeInDown"
@@ -137,13 +146,13 @@ export default function Profile(props) {
           className="animate__animated animate__fadeInDown"
           style={{ animationDelay: "1.2s" }}
         >
-          WishList Price : {WishListPrice}$
+          WishList Price : {WishListPrice.toFixed(2)}$
         </p>
         <p
           className="animate__animated animate__fadeInDown"
           style={{ animationDelay: "1.3s" }}
         >
-          Cart Price : {CartPrice}$
+          Cart Price : {CartPrice.toFixed(2)}$
         </p>
       </div>
     </div>

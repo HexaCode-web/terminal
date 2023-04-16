@@ -1,7 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
 export default function Carousel(props) {
   const slideBtn = props.images.map((photo, index) => {
     return (
       <button
+        key={uuidv4()}
         type="button"
         data-bs-target={`#${props.id}`}
         data-bs-slide-to={index}
@@ -14,6 +16,7 @@ export default function Carousel(props) {
   const photos = props.images.map((photo, index) => {
     return (
       <div
+        key={uuidv4()}
         className={`carousel-item ${index === 0 ? "active" : ""}`}
         data-bs-interval="5000"
       >
