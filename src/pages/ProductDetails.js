@@ -35,7 +35,7 @@ export default function ProductDetails(props) {
     await GETDOC("products", id).then((value) => {
       value !== "Error" ? setProduct(value) : setError(true);
     });
-    JSON.parse(secureLocalStorage.getItem("activeUser")).admin
+    JSON.parse(secureLocalStorage.getItem("activeUser"))?.admin
       ? setIsAdmin(true)
       : setIsAdmin(false);
     setIsLoading(false);
@@ -63,7 +63,7 @@ export default function ProductDetails(props) {
     const Price = item.Offer
       ? item.price - (item.price * item.discountPercentage) / 100
       : item.price;
-    if (!activeUser) {
+    if (Object.keys(activeUser).length === 0) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
@@ -93,7 +93,7 @@ export default function ProductDetails(props) {
     props.setShowCart(true);
   };
   const UpdateWishList = async (item) => {
-    if (!activeUser) {
+    if (Object.keys(activeUser).length === 0) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
@@ -131,12 +131,14 @@ export default function ProductDetails(props) {
     }
   }, [activeUser]);
   useEffect(() => {
-    GETDOC(
-      "users",
-      JSON.parse(secureLocalStorage.getItem("activeUser")).id
-    ).then((res) => {
-      setActiveUser(res);
-    });
+    if (JSON.parse(secureLocalStorage.getItem("activeUser"))) {
+      GETDOC(
+        "users",
+        JSON.parse(secureLocalStorage.getItem("activeUser")).id
+      ).then((res) => {
+        setActiveUser(res);
+      });
+    }
   }, [props.UpdateCart]);
   useEffect(() => {
     getProductAndUser();
@@ -174,7 +176,7 @@ export default function ProductDetails(props) {
     }
   });
   const SendRate = async () => {
-    if (!activeUser) {
+    if (Object.keys(activeUser).length === 0) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
@@ -328,7 +330,7 @@ export default function ProductDetails(props) {
                     <img
                       className="Wish"
                       src={
-                        activeUser
+                        Object.keys(activeUser).length !== 0
                           ? activeUser.wishlist.find((item) => {
                               return item.title === Product.title;
                             })
