@@ -1,0 +1,166 @@
+label img {
+  cursor: pointer;
+  width: 24px;
+  margin: 10px;
+}
+section {
+  margin: 10px auto;
+  padding: 15px;
+  border-radius: 15px;
+  width: 90%;
+  border: 1px solid white;
+}
+.Container {
+  justify-content: unset;
+}
+.Title-Wrapper {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  margin-right: auto;
+  margin-left: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.Title-Wrapper h3 {
+  font-size: 1rem;
+}
+.IconEdit .Data {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.IconEdit .formItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.IconEdit input {
+  text-indent: 10px;
+  background-color: transparent;
+  margin: 20px;
+}
+.IconEdit input:focus {
+  outline: none;
+}
+.HeaderEdit {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.HeaderEdit .formItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+.Data {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+.HeaderEdit .formItem textarea {
+  border: 1px solid white;
+  border-radius: 10px;
+  color: white;
+  resize: none;
+}
+.HeaderEdit .formItem textarea:focus {
+  border: 1px solid transparent;
+}
+.HeaderEdit .Header {
+  width: 100%;
+}
+.MainProducts .formItem {
+  flex-direction: row;
+  align-items: center;
+}
+.MainProducts .formItem select {
+  width: 150px;
+}
+.MainProducts .reviewWrapper {
+  margin: 100px 0;
+  flex-direction: column;
+}
+.MainProducts .reviewWrapper .productReview {
+  max-height: none;
+}
+select {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #333;
+  color: #fff;
+}
+
+/* Style the selected option */
+select option:checked {
+  background-color: #444;
+}
+
+/* Style the dropdown arrow */
+select::-ms-expand {
+  display: none;
+}
+
+select::after {
+  content: "\25BC";
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  color: #fff;
+  pointer-events: none;
+}
+.Banners {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.Banners .Part {
+  width: 100%;
+  border: 1px solid white;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+}
+.Banners .Part .Data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.css-1p3m7a8-multiValue {
+  background-color: hsl(0, 0%, 20%) !important;
+  border: 1px solid white;
+  border-radius: 15px !important;
+}
+.css-wsp0cs-MultiValueGeneric {
+  color: white !important;
+}
+.css-12a83d4-MultiValueRemove:hover {
+  background-color: transparent !important;
+}
+.css-qbdosj-Input {
+  color: white !important;
+}
+.Review {
+  width: 100%;
+}
+.Slider-review-wrapper {
+  border: 2px solid #ee233a;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 15px;
+}
+
+.rotate-up {
+  transform: rotate(180deg);
+}

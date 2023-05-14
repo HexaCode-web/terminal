@@ -1,0 +1,56 @@
+.ExtraList {
+  display: grid;
+  border: 1px solid white;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  grid-template-areas:
+    "Title Title"
+    "ShowList ListName"
+    "ShowPhoto UploadPhoto"
+    "Select Select"
+    "Button Button";
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  padding: 15px;
+}
+.ExtraList #title {
+  grid-area: ListName;
+}
+.ExtraList #Show {
+  grid-area: ShowList;
+}
+.ExtraList #Photo {
+  grid-area: ShowPhoto;
+}
+.ExtraList #upload {
+  grid-area: UploadPhoto;
+}
+.ExtraList #select {
+  grid-area: Select;
+}
+
+.ExtraList h4 {
+  grid-area: Title;
+  text-align: center;
+}
+input[type="checkbox"] {
+  margin: 0 10px;
+}
+.ExtraList .FormItem input {
+  text-indent: 7px;
+  background: transparent !important;
+}
+.ExtraList .FormItem input:focus {
+  outline: none;
+}
+.ExtraList .FormItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ExtraList .button {
+  width: fit-content;
+  margin: auto;
+  margin-top: 30px;
+  grid-area: Button;
+}

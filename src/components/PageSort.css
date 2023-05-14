@@ -1,0 +1,19 @@
+.PageSort {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.PageSort span {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+.Selects-wrapper {
+  margin-top: 20px;
+  width: 100%;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  align-items: space-between; /* Align items vertically */
+  justify-items: space-between; /* Align items horizontally */
+}

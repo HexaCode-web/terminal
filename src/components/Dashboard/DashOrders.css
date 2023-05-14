@@ -1,0 +1,22 @@
+.Pending {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.Pending .buttonWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+.RejectPopUp {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.RejectPopUp textarea {
+  border-radius: 15px;
+  border-color: #9b1e2b;
+  width: 90%;
+}

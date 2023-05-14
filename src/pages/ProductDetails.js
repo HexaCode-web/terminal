@@ -2,8 +2,9 @@ import { useParams } from "react-router-dom";
 import React, { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { Pagination } from "swiper";
+import { Pagination, Autoplay } from "swiper";
 import "swiper/css/pagination";
+import "swiper/css/autoplay";
 import Card from "../components/Card";
 import cart from "../assets/cart-hover.png";
 import wish from "../assets/heart.png";
@@ -16,6 +17,9 @@ import loading from "../assets/loading-13.gif";
 import { v4 as uid } from "uuid";
 import secureLocalStorage from "react-secure-storage";
 import { CreateToast } from "../App";
+import "./ProductDetails.css";
+import MyModal from "../components/Modal";
+import Rate from "../components/Rate";
 import { GETDOC, SETDOC } from "../server";
 export default function ProductDetails(props) {
   const [activeUser, setActiveUser] = React.useState({});
@@ -25,11 +29,16 @@ export default function ProductDetails(props) {
   const [Product, setProduct] = React.useState({});
   const [Error, setError] = React.useState(false);
   const [mainPhoto, setMainPhoto] = React.useState("");
-  const [Rating, setRating] = React.useState(0);
+  const [Rating, setRating] = React.useState({ stars: 0, review: "" });
   const [UserRated, setUserRated] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [showModal, setShowModal] = React.useState(false);
   const id = useParams().ID;
-
+  const discount1 = Product.Offer
+    ? (Product.price * Product.discountPercentage) / 100
+    : 0;
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
   const getProductAndUser = async () => {
     setIsLoading(true);
     await GETDOC("products", id).then((value) => {
@@ -39,6 +48,11 @@ export default function ProductDetails(props) {
       ? setIsAdmin(true)
       : setIsAdmin(false);
     setIsLoading(false);
+  };
+  const updateUser = async (user) => {
+    await SETDOC("users", activeUser.id, {
+      ...user,
+    });
   };
   const UpdateStatics = async (target, action) => {
     let tempData;
@@ -59,38 +73,32 @@ export default function ProductDetails(props) {
     }
     await SETDOC("statistics", "0", tempData);
   };
-  const UpdateCart = async (item) => {
-    const Price = item.Offer
-      ? item.price - (item.price * item.discountPercentage) / 100
-      : item.price;
+  const AddtoCart = async (item) => {
     if (Object.keys(activeUser).length === 0) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
-      if (!Product.stock) {
+      if (Product.stock <= 0) {
         CreateToast("Sorry! we are out of stock!", "error");
         return;
       }
       setInactive(true);
-      props.setShowCart(false);
-      let newAR = activeUser.cart;
-      newAR.push(item);
       setActiveUser((prev) => {
         return {
           ...prev,
           CartCount: prev.CartCount + 1,
-          cart: newAR,
+          cart: [...prev.cart, item],
         };
       });
       await UpdateStatics("cart", "add");
       setAddedNum((prev) => prev + 1);
+
       addedNum === 0
         ? CreateToast("added to the Cart!", "success")
         : CreateToast(`added to the Cart ${addedNum + 1} times`, "success");
     }
     props.setUpdateCart((prev) => prev + 1);
     setInactive(false);
-    props.setShowCart(true);
   };
   const UpdateWishList = async (item) => {
     if (Object.keys(activeUser).length === 0) {
@@ -111,25 +119,85 @@ export default function ProductDetails(props) {
       ) {
         await UpdateStatics("wish", "remove");
         activeUser.wishlist.splice(targetProductPlace, 1);
-
         props.updateUser(activeUser);
         CreateToast("removed from wishlist", "info");
       } else {
         UpdateStatics("wish", "add");
         CreateToast("added to the wishlist!", "success");
         activeUser.wishlist.push(item);
+
         props.updateUser(activeUser);
       }
       setInactive(false);
     }
   };
-  useEffect(() => {
-    if (Object.keys(activeUser) != 0) {
-      SETDOC("users", activeUser.id, {
-        ...activeUser,
-      });
+  const SendRate = async () => {
+    if (Object.keys(activeUser).length === 0) {
+      CreateToast("you aren't signed in!", "error");
+      return;
+    } else {
+      let oldData;
+      if (Product.UsersRated) {
+        oldData = {
+          ...Product,
+          Stars: Product.Stars + Rating.stars,
+          UsersRated: [
+            ...Product.UsersRated,
+            {
+              Name: activeUser.Fname + " " + activeUser.Lname,
+              User: activeUser.Username,
+              review: Rating.review,
+              Stars: Rating.stars,
+            },
+          ],
+        };
+      } else {
+        oldData = {
+          ...Product,
+          Stars: Product.Stars + Rating.stars,
+          UsersRated: [
+            {
+              Name: activeUser.Fname + " " + activeUser.Lname,
+              User: activeUser.Username,
+              review: Rating.review,
+              Stars: Rating.stars,
+            },
+          ],
+        };
+      }
+      const NewData = {
+        ...oldData,
+        rating: oldData.Stars / oldData.UsersRated.length,
+      };
+      try {
+        await SETDOC("products", id, { ...NewData });
+      } catch (error) {
+        CreateToast("something went wrong", "error");
+      }
     }
-  }, [activeUser]);
+  };
+  const setMainImage = (e) => {
+    setMainPhoto(e.target.src);
+  };
+  const photosEL = Product.images
+    ? Product.images.map((photo) => {
+        return (
+          <button
+            className={`thumb ${mainPhoto === photo.url ? "active" : ""}`}
+            onClick={setMainImage}
+            key={uid()}
+          >
+            <img src={photo.url} />
+          </button>
+        );
+      })
+    : "";
+  const handlePrimaryAction = async () => {
+    await SendRate();
+    await getProductAndUser();
+    handleCloseModal();
+  };
+
   useEffect(() => {
     if (JSON.parse(secureLocalStorage.getItem("activeUser"))) {
       GETDOC(
@@ -141,6 +209,12 @@ export default function ProductDetails(props) {
     }
   }, [props.UpdateCart]);
   useEffect(() => {
+    if (Object.keys(activeUser).length !== 0) {
+      updateUser(activeUser);
+    }
+  }, [activeUser]);
+
+  useEffect(() => {
     getProductAndUser();
   }, []);
   useEffect(() => {
@@ -150,16 +224,14 @@ export default function ProductDetails(props) {
     activeUser
       ? Product.UsersRated
         ? Product.UsersRated.find((user) => {
-            if (user === activeUser.Username) {
+            if (user.User === activeUser.Username) {
               return setUserRated(true);
             }
           })
         : ""
       : "";
   }, [Product]);
-  const setMainImage = (e) => {
-    setMainPhoto(e.target.src);
-  };
+
   const NewProducts = props.Items.map((productItem) => {
     if (productItem.category === Product.category) {
       if (productItem.title === Product.title) {
@@ -175,57 +247,27 @@ export default function ProductDetails(props) {
       return;
     }
   });
-  const SendRate = async () => {
-    if (Object.keys(activeUser).length === 0) {
-      CreateToast("you aren't signed in!", "error");
-      return;
-    } else {
-      setInactive(true);
-      let oldData;
-      if (Product.UsersRated) {
-        oldData = {
-          ...Product,
-          Stars: Product.Stars + Rating,
-          UsersRated: [...Product.UsersRated, activeUser.Username],
-        };
-      } else {
-        oldData = {
-          ...Product,
-          Stars: Product.Stars + Rating,
-          UsersRated: [activeUser.Username],
-        };
-      }
-      const NewData = {
-        ...oldData,
-        rating: oldData.Stars / oldData.UsersRated.length,
+
+  const Rates = Product.UsersRated?.map((rate) => {
+    return (
+      <SwiperSlide key={uid()}>
+        <Rate rate={rate} />
+      </SwiperSlide>
+    );
+  });
+  useEffect(() => {
+    const mainImg = document.querySelector(".mainIMG");
+    if (mainImg) {
+      mainImg.classList.add("animate__animated", "animate__backInDown");
+      const animationEndHandler = () => {
+        mainImg.classList.remove("animate__animated", "animate__backInDown");
       };
-      try {
-        await SETDOC("products", id, { ...NewData });
-        CreateToast("your changes have been saved", "success");
-        window.location.reload();
-        setInactive(false);
-      } catch (error) {
-        CreateToast("something went wrong", "error");
-        setInactive(false);
-      }
+      mainImg.addEventListener("animationend", animationEndHandler);
+      return () => {
+        mainImg.removeEventListener("animationend", animationEndHandler);
+      };
     }
-  };
-  const photosEL = Product.images
-    ? Product.images.map((photo) => {
-        return (
-          <button
-            className={`thumb ${mainPhoto === photo ? "active" : ""}`}
-            onClick={setMainImage}
-            key={uid()}
-          >
-            <img src={photo.url} />
-          </button>
-        );
-      })
-    : "";
-  const discount1 = Product.Offer
-    ? (Product.price * Product.discountPercentage) / 100
-    : 0;
+  }, [mainPhoto]);
   return (
     <>
       {inactive && (
@@ -239,88 +281,71 @@ export default function ProductDetails(props) {
         <div>
           <div className="Details">
             <div className="left">
-              <div
-                style={{
-                  minHeight: "600px",
-                  minWidth: "500px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+              <div className="MainIMG-wrapper">
                 <img className="mainIMG" src={mainPhoto ? mainPhoto : ""} />
               </div>
               <div className="ThumbPhotos">{photosEL}</div>
             </div>
             <div className="right">
-              <h1 className="Product">{Product.title}</h1>
-              <p className="Overview">{Product.description}</p>
-              <div className="rating" style={{ justifyContent: "flex-start" }}>
-                <img
-                  src={Product.rating >= 1 ? starFilled : Star}
-                  style={{ scale: "1.5" }}
-                ></img>
-                <img
-                  src={Product.rating >= 2 ? starFilled : Star}
-                  style={{ scale: "1.5", margin: "5px" }}
-                ></img>
-                <img
-                  src={Product.rating >= 3 ? starFilled : Star}
-                  style={{ scale: "1.5", margin: "5px" }}
-                ></img>
-                <img
-                  src={Product.rating >= 4 ? starFilled : Star}
-                  style={{ scale: "1.5", margin: "5px" }}
-                ></img>
-                <img
-                  src={Product.rating >= 5 ? starFilled : Star}
-                  style={{ scale: "1.5", margin: "5px" }}
-                ></img>
-              </div>{" "}
-              <span style={{ margin: "10px 0", display: "block" }}>
-                {Product.UsersRated ? Product.UsersRated.length : 0} Users Rated{" "}
-              </span>
+              <h1 className="Product animate__animated animate__fadeInRightBig">
+                {Product.title}
+              </h1>
+              <div className="Rating-wrapper animate__animated animate__fadeInRightBig">
+                <div className="ratingOuter">
+                  <img src={Product.rating >= 1 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 2 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 3 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 4 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 5 ? starFilled : Star}></img>
+                </div>
+                <span>
+                  ( {Product.UsersRated ? Product.UsersRated.length : 0} users )
+                </span>
+              </div>
+              <p className="Overview animate__animated animate__fadeInRightBig">
+                {Product.description}
+              </p>
+              <div className="Sold-wrapper animate__animated animate__fadeInRightBig">
+                <div>{Product.Sold} users bought this</div>
+              </div>
               {!UserRated && !isAdmin ? (
                 <button
-                  type="button"
-                  className="Rate cart"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
+                  className="Rate cart animate__animated animate__backInUp"
+                  onClick={handleShowModal}
                 >
                   Rate Product
                 </button>
               ) : (
                 ""
               )}
-              <div>
+              <div className="Price-Stock-wrapper  animate__animated animate__fadeInRightBig">
                 $ {""}
                 <span className="Price">
-                  {Math.round(Product.price - discount1)}
+                  {(Product.price - discount1).toFixed(2)}
                 </span>
-              </div>
-              {Product.Offer && <p className="OldPrice">{Product.price}</p>}
-              {Product.stock ? (
-                Product.stock < 5 ? (
-                  <p className="Stock">
-                    Only{" "}
-                    <span style={{ color: "#ee233a", fontWeight: "bolder" }}>
-                      {Product.stock}
-                    </span>{" "}
-                    left!
-                  </p>
+                {Product.stock > 0 ? (
+                  Product.stock < 5 ? (
+                    <p className="Stock">
+                      Only <span>{Product.stock}</span> left!
+                    </p>
+                  ) : (
+                    <p className="Stock">In Stock</p>
+                  )
                 ) : (
-                  <p className="Stock">In Stock</p>
-                )
-              ) : (
-                <p className="Stock out">Out of stock</p>
+                  <p className="Stock out">Out of stock</p>
+                )}
+              </div>
+              {Product.Offer && (
+                <p className="OldPrice  animate__animated animate__fadeInRightBig ">
+                  {Product.price}
+                </p>
               )}
               <div className="buttons">
                 {isAdmin ? (
                   <button
                     className={`cart ${Product.stock ? "" : "button-inactive"}`}
                     onClick={() => {
-                      window.location.replace(
-                        `/Dashboard/Product/${Product.id}`
-                      );
+                      window.location.href = `/Dashboard/Product/${Product.id}`;
                     }}
                   >
                     Edit Product / Add Stock
@@ -328,7 +353,7 @@ export default function ProductDetails(props) {
                 ) : (
                   <>
                     <img
-                      className="Wish"
+                      className="Wish animate__animated animate__bounceIn"
                       src={
                         Object.keys(activeUser).length !== 0
                           ? activeUser.wishlist.find((item) => {
@@ -343,11 +368,11 @@ export default function ProductDetails(props) {
                       }}
                     />
                     <button
-                      className={`cart ${
-                        Product.stock ? "" : "button-inactive"
+                      className={`cart animate__animated animate__bounceIn ${
+                        Product.stock > 0 ? "" : "button-inactive"
                       }`}
                       onClick={() => {
-                        UpdateCart(Product);
+                        AddtoCart(Product);
                       }}
                     >
                       <img src={cart} />
@@ -358,7 +383,35 @@ export default function ProductDetails(props) {
               </div>
             </div>
           </div>
-          <h2 style={{ margin: "20px" }}> Similar Products</h2>
+          <div className="UserRates">
+            <h3>What do the users have to say about this product?</h3>
+            <div style={{ width: "100%" }}>
+              {Product.UsersRated.length > 0 ? (
+                <Swiper
+                  modules={[Pagination, Autoplay]}
+                  autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  freeMode={true}
+                  loop={true}
+                  slidesPerView={1}
+                  pagination={{
+                    clickable: true,
+                  }}
+                  className="mySwiper"
+                >
+                  {Rates}
+                </Swiper>
+              ) : (
+                <h4 style={{ textAlign: "center", margin: "20px" }}>
+                  No Rates yet! check back later or be the first!
+                </h4>
+              )}
+            </div>
+          </div>
+          <h2> Similar Products</h2>
           <Swiper
             freeMode={true}
             slidesPerView={5}
@@ -371,84 +424,81 @@ export default function ProductDetails(props) {
           >
             {NewProducts}
           </Swiper>
-          <div
-            className="modal fade"
-            id="exampleModal"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
+          <MyModal
+            className="RateModalWrapper"
+            show={showModal}
+            handleClose={handleCloseModal}
+            title={`Rate ${Product.title}`}
+            primaryButtonText="Rate"
+            handlePrimaryAction={handlePrimaryAction}
           >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h2 className="modal-title fs-5" style={{ color: "black" }}>
-                    Rate {Product.title}
-                  </h2>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="rating">
-                    <img
-                      src={Rating >= 1 ? starFilled : StarB}
-                      style={{ scale: "2", margin: "10px", cursor: "pointer" }}
-                      onClick={() => {
-                        setRating(1);
-                      }}
-                    ></img>
-                    <img
-                      src={Rating >= 2 ? starFilled : StarB}
-                      style={{ scale: "2", margin: "10px", cursor: "pointer" }}
-                      onClick={() => {
-                        setRating(2);
-                      }}
-                    ></img>
-                    <img
-                      src={Rating >= 3 ? starFilled : StarB}
-                      style={{ scale: "2", margin: "10px", cursor: "pointer" }}
-                      onClick={() => {
-                        setRating(3);
-                      }}
-                    ></img>
-                    <img
-                      src={Rating >= 4 ? starFilled : StarB}
-                      style={{ scale: "2", margin: "10px", cursor: "pointer" }}
-                      onClick={() => {
-                        setRating(4);
-                      }}
-                    ></img>
-                    <img
-                      src={Rating >= 5 ? starFilled : StarB}
-                      style={{ scale: "2", margin: "10px", cursor: "pointer" }}
-                      onClick={() => {
-                        setRating(5);
-                      }}
-                    ></img>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={SendRate}
-                  >
-                    Rate
-                  </button>
-                </div>
+            <>
+              <div className="rating">
+                <img
+                  className="img"
+                  src={Rating.stars >= 1 ? starFilled : StarB}
+                  onClick={() => {
+                    setRating((prev) => {
+                      return { ...prev, stars: 1 };
+                    });
+                  }}
+                ></img>
+                <img
+                  className="img"
+                  src={Rating.stars >= 2 ? starFilled : StarB}
+                  onClick={() => {
+                    setRating((prev) => {
+                      return { ...prev, stars: 2 };
+                    });
+                  }}
+                ></img>
+                <img
+                  className="img"
+                  src={Rating.stars >= 3 ? starFilled : StarB}
+                  onClick={() => {
+                    setRating((prev) => {
+                      return { ...prev, stars: 3 };
+                    });
+                  }}
+                ></img>
+                <img
+                  className="img"
+                  src={Rating.stars >= 4 ? starFilled : StarB}
+                  onClick={() => {
+                    setRating((prev) => {
+                      return { ...prev, stars: 4 };
+                    });
+                  }}
+                ></img>
+                <img
+                  className="img"
+                  src={Rating.stars >= 5 ? starFilled : StarB}
+                  onClick={() => {
+                    setRating((prev) => {
+                      return { ...prev, stars: 5 };
+                    });
+                  }}
+                ></img>
               </div>
-            </div>
-          </div>
+              <div className="formItem">
+                <label htmlFor="Review">
+                  Say an honest thing about the product:(optional)
+                </label>
+                <textarea
+                  id="Review"
+                  value={Rating.review}
+                  onChange={(e) => {
+                    setRating((prev) => {
+                      return {
+                        ...prev,
+                        review: e.target.value,
+                      };
+                    });
+                  }}
+                ></textarea>
+              </div>
+            </>
+          </MyModal>
         </div>
       ) : (
         ""

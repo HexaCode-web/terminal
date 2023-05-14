@@ -1,102 +1,62 @@
 /* DATABASE end*/
-import { initializeApp } from "firebase/app";
-import { doc, getFirestore, getDoc } from "firebase/firestore";
-import DB from "../DBConfig.json";
 import React, { useEffect } from "react";
-import loadingDark from "../assets/loadingDark.gif";
 import deleteIcon from "../assets/delete.png";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
-import Users from "../components/DashUsers";
-import Products from "../components/DashProducts";
+import Users from "../components/Dashboard/DashUsers";
+import Products from "../components/Dashboard/DashProducts";
 import "react-toastify/dist/ReactToastify.css";
-import MyModal from "../components/Modal";
+import "./Dashboard.css";
 import secureLocalStorage from "react-secure-storage";
-import DashCate from "../components/DashCate";
+import DashCate from "../components/Dashboard/DashCate";
+import date from "date-and-time";
 import { CreateToast } from "../App";
-import {
-  DELETEDOC,
-  GETCOLLECTION,
-  GETDOC,
-  SETDOC,
-  productDistributor,
-} from "../server";
-const app = initializeApp(DB.firebaseConfig);
-const db = getFirestore(app);
+import { GETCOLLECTION, GETDOC, SETDOC, productDistributor } from "../server";
+import PendingOrders from "../components/Dashboard/DashOrders";
+import DashHistory from "../components/Dashboard/DashHistory";
+import AdminProfile from "../components/Dashboard/AdminProfile";
+import WebSettings from "../components/Dashboard/WebSettings";
 ChartJS.register(ArcElement, Tooltip, Legend);
-
+import Widget from "../components/Dashboard/Widget";
+import ProductList from "../components/SearchResult";
 export default function DashBoard(props) {
   const [ActiveUser, setActiveUser] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser"))
   );
   const [statistics, setStatistics] = React.useState({});
+  const [oldStatistics, setOldStatistics] = React.useState(null);
   const [greeting, setGreeting] = React.useState("");
   const [activeUsers, setActiveUsers] = React.useState(0);
+  const [compareValues, setCompareValues] = React.useState({
+    CartNum: 0,
+    AcceptedOrders: 0,
+    Net: 0,
+    PendingOrders: 0,
+    LoggedInUsers: 0,
+    Products: 0,
+    RejectedOrders: 0,
+    Revenue: 0,
+    TotalDiscount: 0,
+    UserCount: 0,
+    notes: 0,
+  });
   const [UserList, setUserList] = React.useState([]);
   const [catagories, setCatagories] = React.useState([]);
   const [productList, setProductList] = React.useState([]);
-  const [activePage, setActivePage] = React.useState("Dashboard");
-  const [chartData, setChartData] = React.useState();
+  const [activePage, setActivePage] = React.useState("Overview");
+  const [chartData, setChartData] = React.useState(null);
   const [Notes, setNotes] = React.useState([]);
-  const [ShowChangePassword, setShowChangePassword] = React.useState(false);
-  const [showModal, setShowModal] = React.useState(false);
-  const [changePass, setChangePass] = React.useState({
-    oldPass: ActiveUser.Password,
-    verifyPass: "",
-    newPass: "",
-  });
-
-  /*PERSONAL ADMIN INFO*/
-  const handleInput = (e) => {
-    const { name, value } = e.target;
-    setActiveUser((prev) => {
-      return { ...prev, [name]: value };
-    });
-  };
-
-  const handlePassInput = (e) => {
-    const { name, value } = e.target;
-    setChangePass((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
-  const validatePass = () => {
-    if (changePass.verifyPass === changePass.oldPass) {
-      props.UpdateUser(ActiveUser, true, changePass.newPass);
-    } else {
-      CreateToast("Old Password doesn't match your password", "error");
-    }
-  };
-  /*PERSONAL ADMIN INFO*/
-
-  /*USERS  SETTINGS*/
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-  const handlePrimaryAction = async (e) => {
-    await DELETEDOC("users", ActiveUser.id);
-    setShowModal(false);
-    secureLocalStorage.clear();
-    setTimeout(() => {
-      window.location.replace("/User");
-    }, 500);
-  };
-  /* END USERS  SETTINGS*/
+  const pattern = date.compile("ddd, MMM DD YYYY, HH:mm:ss");
   /*GETTING NUMBERS*/
   const fetchNumbers = async () => {
-    let cleanUserList = [];
     let catagoriesLocal = {};
-    await GETCOLLECTION("users").then((response) => {
-      cleanUserList = response;
-    });
+
     await GETCOLLECTION("categories").then((res) => {
       setCatagories(res);
       catagoriesLocal = res;
     });
-
-    setUserList(cleanUserList);
+    const UserList = await GETCOLLECTION("users");
+    setUserList(UserList.filter((user) => user.deleteUser === false));
     let cleanProductsData = [];
     await GETCOLLECTION("products").then((response) => {
       cleanProductsData = response;
@@ -124,10 +84,75 @@ export default function DashBoard(props) {
         },
       ],
     });
-    GETDOC("statistics", 0).then((value) => {
-      setStatistics(value);
-      setNotes(value.notes);
-    });
+    let fetchedData = await GETDOC("statistics", 0);
+    setStatistics(fetchedData);
+    setNotes(fetchedData.notes);
+  };
+  const compareTime = async () => {
+    // Get the old statistics data
+    let oldStatisticsData = await GETDOC("statistics", "OldVersion");
+
+    // Parse the date string from the old data and calculate the time difference in hours
+    const pastDate = new Date(oldStatisticsData.DateMade.replace(",", ""));
+    const currentDate = new Date();
+    const timeDiffInHours =
+      (currentDate.getTime() - pastDate.getTime()) / 1000 / 60 / 60;
+
+    // Check if at least 24 hours have passed since the old data was fetched
+    const is24HoursPassed = timeDiffInHours >= 24;
+
+    // Set the old statistics data state
+    setOldStatistics(oldStatisticsData);
+
+    if (is24HoursPassed) {
+      // If 24 hours have passed, fetch new statistics data and update the old data
+      console.log("24 hours have passed. Updating old statistics data...");
+
+      let newStatisticsData = await GETDOC("statistics", 0);
+
+      // Format the current date in a specific pattern and update the old data with the new statistics data
+      const now = new Date();
+      const formattedDate = date.format(now, "YYYY/MM/DD HH:mm:ss");
+      compareData();
+      await SETDOC("statistics", "OldVersion", {
+        ...newStatisticsData,
+        DateMade: formattedDate,
+      });
+    } else {
+      // If less than 24 hours have passed, log a message and return
+      console.log("Less than 24 hours have passed. Skipping update...");
+      return;
+    }
+  };
+
+  const compareData = () => {
+    // Compare the new and old statistics data and log the results
+    if (statistics && oldStatistics) {
+      let percentDiffObject = {};
+
+      // loop over each key in statistics object
+      for (let key in statistics) {
+        if (typeof statistics[key] === "object") {
+          const currentPercentDiff =
+            oldStatistics[key].length === 0
+              ? 0
+              : ((statistics[key].length - oldStatistics[key].length) /
+                  oldStatistics[key].length) *
+                100;
+          // add percentage difference to object
+          percentDiffObject[key] = currentPercentDiff.toFixed(2);
+        } else {
+          // calculate percentage difference for the current key
+          const currentPercentDiff =
+            ((statistics[key] - oldStatistics[key]) / oldStatistics[key]) * 100;
+
+          // add percentage difference to object
+          percentDiffObject[key] = currentPercentDiff.toFixed(2);
+        }
+      }
+      // set state with new object
+      setCompareValues(percentDiffObject);
+    }
   };
   const CountUsers = async () => {
     setActiveUsers(0);
@@ -191,60 +216,216 @@ export default function DashBoard(props) {
     ChangeStatues();
     CountUsers();
     distribute();
+    compareTime();
     if (new Date().getHours() < 12) setGreeting("Good morning");
     else if (new Date().getHours() < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
   }, []);
   useEffect(() => {
     if (!(Object.keys(statistics).length === 0)) {
-      SETDOC("statistics", 0, { ...statistics, UserCount: UserList.length });
+      SETDOC("statistics", 0, {
+        ...statistics,
+        UserCount: UserList.length,
+        Products: productList?.length,
+        LoggedInUsers: activeUsers,
+      });
+      compareData();
     }
   }, [statistics]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setStatistics(await GETDOC("statistics", 0));
+    };
+    fetchData();
+  }, [activePage]);
+  const CheckInfo = (res) => {
+    const vals = Object.keys(res).map(function (key) {
+      return res[key];
+    });
+    for (let index = 0; index < vals.length; index++) {
+      if (typeof vals[index] !== "boolean") {
+        if (typeof vals[index] !== "object")
+          if (vals[index] !== 0) {
+            if (!vals[index]) {
+              CreateToast(
+                `your Profile is incomplete! go to ${
+                  res.admin ? "Admin Profile" : "settings"
+                } to complete it`,
+                "warn"
+              );
+              return;
+            }
+          }
+      }
+    }
+  };
+  useEffect(() => {
+    const checkData = async () => {
+      let fetchedData = {};
+      GETDOC("users", ActiveUser.id).then((res) => {
+        fetchedData = res;
+        setActiveUser(res);
+        CheckInfo(fetchedData);
+      });
+    };
+    checkData();
+  }, []);
+  useEffect(() => {
+    const handleWindowFocus = async () => {
+      await GETDOC("statistics", 0).then((res) => {
+        setStatistics(res);
+      });
+    };
+    window.addEventListener("focus", handleWindowFocus);
+    return () => {
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, []);
   return (
     <div className="Dashboard">
       {props.UserUpdated && CreateToast("Updated your info!", "success")}
       <div className="SideBar">
         <h3 className="Greet">
-          {greeting} <br />
-          <br /> {ActiveUser.Username}
+          <span className=" animate__animated animate__fadeInUp">
+            {greeting}
+          </span>{" "}
+          <br />
+          <br />
+          <span
+            className=" animate__animated animate__fadeInUp"
+            style={{ animationDelay: ".3s" }}
+          >
+            {ActiveUser.Username}
+          </span>
         </h3>
         <ul className="BTNList">
           <li>
-            <h3
-              onClick={() => setActivePage("Dashboard")}
-              className={activePage === "Dashboard" ? "ActiveLink" : ""}
+            <span
+              style={{ animationDelay: ".4s" }}
+              className="animate__animated animate__fadeInLeft"
             >
-              DashBoard
+              -Main
+            </span>
+            <ul>
+              <li>
+                <h3
+                  style={{ animationDelay: ".4s" }}
+                  onClick={() => setActivePage("Overview")}
+                  className={`${
+                    activePage === "Overview" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Overview
+                </h3>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span
+              style={{ animationDelay: ".5s" }}
+              className="animate__animated animate__fadeInLeft"
+            >
+              -Lists
+            </span>
+            <ul>
+              <li>
+                <h3
+                  style={{ animationDelay: ".5s" }}
+                  onClick={() => setActivePage("Users")}
+                  className={`${
+                    activePage === "Users" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Users
+                </h3>
+              </li>
+              <li>
+                <h3
+                  style={{ animationDelay: ".6s" }}
+                  onClick={() => setActivePage("Products")}
+                  className={`${
+                    activePage === "Products" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Products
+                </h3>
+              </li>
+              <li>
+                <h3
+                  style={{ animationDelay: ".7s" }}
+                  onClick={() => setActivePage("categories")}
+                  className={`${
+                    activePage === "categories" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Categories
+                </h3>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span
+              style={{ animationDelay: ".9s" }}
+              className="animate__animated animate__fadeInLeft"
+            >
+              -Orders
+            </span>
+            <ul>
+              <li>
+                <h3
+                  style={{ animationDelay: ".9s" }}
+                  onClick={() => setActivePage("Pending")}
+                  className={`${
+                    activePage === "Pending" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Pending Orders
+                </h3>
+              </li>
+              <li>
+                <h3
+                  style={{ animationDelay: "1s" }}
+                  onClick={() => setActivePage("OrderHistory")}
+                  className={`${
+                    activePage === "OrderHistory" ? "ActiveLink" : ""
+                  } animate__animated animate__fadeInLeft`}
+                >
+                  Order History
+                </h3>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span
+              style={{ animationDelay: "1.1s" }}
+              className="animate__animated animate__fadeInLeft"
+            >
+              -Customize
+            </span>
+            <h3
+              style={{ animationDelay: "1.1s" }}
+              onClick={() => setActivePage("WebSettings")}
+              className={`${
+                activePage === "WebSettings" ? "ActiveLink" : ""
+              } animate__animated animate__fadeInLeft`}
+            >
+              Website Settings
             </h3>
           </li>
           <li>
-            <h3
-              onClick={() => setActivePage("Users")}
-              className={activePage === "Users" ? "ActiveLink" : ""}
+            {" "}
+            <span
+              style={{ animationDelay: ".8s" }}
+              className="animate__animated animate__fadeInLeft"
             >
-              Users
-            </h3>
-          </li>
-          <li>
+              -Admin
+            </span>
             <h3
-              onClick={() => setActivePage("Products")}
-              className={activePage === "Products" ? "ActiveLink" : ""}
-            >
-              Products
-            </h3>
-          </li>
-          <li>
-            <h3
-              onClick={() => setActivePage("categories")}
-              className={activePage === "categories" ? "ActiveLink" : ""}
-            >
-              Categories
-            </h3>
-          </li>
-          <li>
-            <h3
+              style={{ animationDelay: ".8s" }}
               onClick={() => setActivePage("Profile")}
-              className={activePage === "Profile" ? "ActiveLink" : ""}
+              className={`${
+                activePage === "Profile" ? "ActiveLink" : ""
+              } animate__animated animate__fadeInLeft`}
             >
               Admin Profile
             </h3>
@@ -252,83 +433,178 @@ export default function DashBoard(props) {
         </ul>
       </div>
       <div className="Main">
-        {activePage === "Dashboard" ? (
+        {activePage === "Overview" ? (
           /* DASHBOARD START*/
           <div className="DashBoardInner">
-            <div className="Cards-wrapper">
-              <div
-                className="Card"
-                onClick={CountUsers}
-                style={{ cursor: "pointer" }}
-              >
-                <h6>Logged in Users:</h6>
-                <div className="counter-wrapper">
-                  {activeUsers ? (
-                    <h5>{activeUsers}</h5>
-                  ) : (
-                    <img
-                      alt="loading"
-                      className="Loading"
-                      src={loadingDark}
-                    ></img>
-                  )}
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      display: "block",
-                      marginTop: "10px",
-                    }}
-                  >
-                    (Click to update)
-                  </span>
-                </div>
-              </div>
-              <div
-                className="Card"
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setActivePage("Users");
+            <div className="Cards-wrapper animate__animated animate__fadeIn">
+              <Widget
+                delay="0"
+                data={{
+                  Title: "Users:",
+                  Info: UserList.length,
+                  Link: "Users",
+                  percent: compareValues.UserCount,
+                  Dollar: false,
                 }}
-              >
-                <h6>Total Users Count:</h6>
-                <h5>{statistics.UserCount && statistics.UserCount}</h5>
-              </div>
-              <div
-                className="Card"
-                onClick={() => {
-                  setActivePage("Products");
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".1"
+                data={{
+                  Title: "Logged in Users:",
+                  Info: activeUsers,
+                  Link: "",
+                  percent: compareValues.LoggedInUsers,
+                  Dollar: false,
                 }}
-                style={{ cursor: "pointer" }}
-              >
-                <h6>Total Products Sold:</h6>
-                <h5>
-                  {statistics.ProductsSold && statistics.ProductsSold.length}
-                </h5>
-              </div>
-              <div className="Card">
-                <h6>Net :</h6>
-                <h5>{statistics.Net && Math.round(statistics.Net)}$</h5>
-              </div>
-              -
-              <div className="Card">
-                <h6>Discounts Made :</h6>
-                <h5>
-                  {statistics.TotalDiscount &&
-                    Math.round(statistics.TotalDiscount)}
-                  $
-                </h5>
-              </div>
-              =
-              <div className="Card">
-                <h6>Revenue :</h6>
-                <h5>{statistics.Revenue && Math.round(statistics.Revenue)}$</h5>
-              </div>
-            </div>
-            <div className="Charts">
-              {chartData ? <Pie className="Chart" data={chartData} /> : ""}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".2s"
+                data={{
+                  Title: "Products:",
+                  Info: productList.length,
+                  Link: "Products",
+                  percent: compareValues.Products,
+                  Dollar: false,
+                }}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".3s"
+                data={{
+                  Title: "Total Earnings:",
+                  Info: statistics.Revenue,
+                  Link: "",
+                  percent: compareValues.Revenue,
+                  Dollar: true,
+                }}
+                setActivePage={setActivePage}
+              />
             </div>
 
-            <div className="Notes">
+            <div className="Charts ">
+              <div className="Left" style={{ marginRight: "60px" }}>
+                <h3 style={{ textAlign: "center" }}>daily income</h3>
+                <div className="Progress">
+                  {statistics?.Revenue - oldStatistics?.Revenue === 0 ? (
+                    <p style={{ textAlign: "center" }}>no sales were made</p>
+                  ) : (
+                    <>
+                      <Pie
+                        className="Chart animate__animated animate__backInRight"
+                        data={{
+                          labels: ["Profit", "Discounts"],
+                          datasets: [
+                            {
+                              label: "$",
+                              data: [
+                                statistics?.Revenue - oldStatistics?.Revenue,
+                                statistics?.TotalDiscount -
+                                  oldStatistics?.TotalDiscount,
+                              ],
+                              backgroundColor: [
+                                "rgba(57, 204, 110, 0.4)",
+                                "rgba(255, 0, 0, 0.8)",
+                              ],
+                              borderColor: ["#27ae60", "#ee233a"],
+                              borderWidth: 1,
+                            },
+                          ],
+                        }}
+                      />
+                      <p>Total daily Profit :</p>
+                      <h3> {statistics?.Revenue - oldStatistics?.Revenue}$</h3>
+                      <div className="SideNumbers">
+                        <div className="Left">
+                          <p> Discounts :</p>
+                          <span>
+                            {statistics?.TotalDiscount -
+                              oldStatistics?.TotalDiscount}
+                            $
+                          </span>
+                        </div>
+                        <div className="Right">
+                          <p> Sales :</p>
+                          <span>{statistics?.Net - oldStatistics?.Net}$</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="Right">
+                <h3 style={{ textAlign: "center" }}>Products Data</h3>
+                {chartData ? (
+                  <Pie
+                    className="Chart animate__animated animate__backInRight"
+                    data={chartData}
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>
+            <div className="Cards-wrapper">
+              <Widget
+                delay=".4s"
+                data={{
+                  Title: "OverAll Discounts:",
+                  Info: statistics.TotalDiscount,
+                  Link: "",
+                  percent: "",
+                  Dollar: true,
+                }}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".5s"
+                data={{
+                  Title: "Overall Profit Before Discounts:",
+                  Info: statistics.Net,
+                  Link: "",
+                  percent: compareValues.Net,
+                  Dollar: true,
+                }}
+                setActivePage={setActivePage}
+              />
+            </div>
+            <div className="Cards-wrapper">
+              <Widget
+                delay=".6s"
+                data={{
+                  Title: "Pending Orders:",
+                  Info: statistics.PendingOrders?.length,
+                  Link: "Pending",
+                  percent: compareValues.PendingOrders,
+                  Dollar: false,
+                }}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".7s"
+                data={{
+                  Title: "Accepted Orders:",
+                  Info: statistics.AcceptedOrders?.length,
+                  Link: "OrderHistory",
+                  percent: compareValues.AcceptedOrders,
+                  Dollar: false,
+                }}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".8s"
+                data={{
+                  Title: "Declined Orders:",
+                  Info: statistics.RejectedOrders?.length,
+                  Link: "OrderHistory",
+                  percent: compareValues.RejectedOrders,
+                  Dollar: false,
+                }}
+                setActivePage={setActivePage}
+              />
+            </div>
+            <div className="Notes animate__animated animate__backInUp">
               <h3>Notes</h3>
               <div className="input-wrapper">
                 <input
@@ -366,7 +642,7 @@ export default function DashBoard(props) {
           /* DASHBOARD END*/
           ""
         )}
-        {activePage === "Users" ? <Users UserList={UserList} /> : ""}
+        {activePage === "Users" ? <Users /> : ""}
         {activePage === "Products" ? (
           <Products
             Data={props.Data}
@@ -378,169 +654,7 @@ export default function DashBoard(props) {
         )}
         {activePage === "Profile" ? (
           /* Profile START*/
-          <>
-            <div className="General">
-              <h1>General info</h1>
-              <form>
-                <div id="Fname">
-                  <label for="first-name">First Name:</label>
-                  <input
-                    type="text"
-                    id="first-name"
-                    name="Fname"
-                    value={ActiveUser.Fname}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Lname">
-                  <label for="last-name">Last Name:</label>
-                  <input
-                    type="text"
-                    id="last-name"
-                    name="Lname"
-                    value={ActiveUser.Lname}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Username">
-                  <label for="username">Username:</label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="Username"
-                    value={ActiveUser.Username}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Phone">
-                  <label for="phone">Phone Number:</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={ActiveUser.phone}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Email">
-                  <label for="email">Email:</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={ActiveUser.email}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Address">
-                  <label for="address">Address:</label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={ActiveUser.address}
-                    onChange={handleInput}
-                  />
-                </div>
-                <div id="Gender">
-                  <label for="gender">Gender:</label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={ActiveUser.gender}
-                    onChange={handleInput}
-                  >
-                    <option value="" selected disabled>
-                      Select your gender
-                    </option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                </div>
-                <div id="DOB">
-                  <label for="birthdate">Date of Birth:</label>
-                  <input
-                    type="date"
-                    id="birthdate"
-                    name="dateOfBirth"
-                    value={ActiveUser.dateOfBirth}
-                    onChange={handleInput}
-                  />
-                </div>
-                <input
-                  id="Save"
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    props.UpdateUser(ActiveUser, false);
-                  }}
-                  value="Save"
-                  style={{ margin: "auto", width: "50%" }}
-                />
-              </form>
-            </div>
-            <div className="Privacy">
-              <div className="Button-Wrapper">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    setShowChangePassword((prev) => !prev);
-                  }}
-                >
-                  Change Password
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={handleShowModal}
-                  style={{ margin: "auto" }}
-                >
-                  delete Account
-                </button>
-                <MyModal
-                  show={showModal}
-                  handleClose={handleCloseModal}
-                  title="Delete Account"
-                  primaryButtonText="Delete my account"
-                  handlePrimaryAction={handlePrimaryAction}
-                >
-                  <>
-                    <p style={{ textAlign: "center" }}>
-                      are you sure you want to delete your account? this action
-                      is IRREVERSIBLE
-                    </p>
-                  </>
-                </MyModal>
-              </div>
-              {ShowChangePassword ? (
-                <form className="form-Wrapper">
-                  <label htmlFor="oldPass">old Password:</label>
-                  <input
-                    id="oldPass"
-                    name="verifyPass"
-                    onChange={handlePassInput}
-                  ></input>
-                  <label htmlFor="oldPass">New Password:</label>
-                  <input
-                    id="newPass"
-                    name="newPass"
-                    onChange={handlePassInput}
-                  ></input>
-                  <input
-                    id="Save"
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      validatePass(e);
-                    }}
-                    value="Save"
-                  />
-                </form>
-              ) : (
-                ""
-                /* Profile END*/
-              )}
-            </div>
-          </>
+          <AdminProfile ActiveUser={ActiveUser} UpdateUser={props.UpdateUser} />
         ) : (
           ""
         )}
@@ -549,17 +663,33 @@ export default function DashBoard(props) {
         ) : (
           ""
         )}
+        {activePage === "Pending" ? (
+          <PendingOrders
+            orders={statistics.PendingOrders}
+            setActivePage={setActivePage}
+            UserList={UserList}
+            productList={productList}
+            ActiveUser={ActiveUser}
+          />
+        ) : (
+          ""
+        )}
+        {activePage === "OrderHistory" ? (
+          <DashHistory
+            AcceptedOrders={statistics.AcceptedOrders}
+            RejectedOrders={statistics.RejectedOrders}
+            productList={productList}
+            UserList={UserList}
+          />
+        ) : (
+          ""
+        )}
+        {activePage === "WebSettings" ? (
+          <WebSettings productList={productList} />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
 }
-/*
-    Revenue: 0,
-    CartNum: 0,
-    ProductsSold: [],
-    notes: [],
-    Net: 0,
-    UserCount: 0,
-    TotalDiscount: 0,
-    WishNum: 0
- */

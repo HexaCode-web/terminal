@@ -20,7 +20,7 @@ export default function Carousel(props) {
         className={`carousel-item ${index === 0 ? "active" : ""}`}
         data-bs-interval="5000"
       >
-        <img src={photo.url} className="d-block w-100" alt="..." />
+        <img src={photo.url} className="d-block" alt="..." />
       </div>
     );
   });

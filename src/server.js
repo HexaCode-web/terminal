@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { initializeApp } from "firebase/app";
 import {
   collection,
@@ -16,9 +15,21 @@ import {
   uploadBytes,
   deleteObject,
 } from "firebase/storage";
-import DB from "./DBConfig.json";
-const app = initializeApp(DB.firebaseConfig);
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  deleteUser,
+  updateEmail,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { firebaseConfig } from "./DBConfig.js";
+import { CreateToast } from "./App.js";
+export const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 const storage = getStorage(app);
 export const UPLOADPHOTO = async (path, photo) => {
   const snapshot = await uploadBytes(ref(storage, path), photo);
@@ -46,7 +57,79 @@ export const GETCOLLECTION = async (target) => {
    cleanData = response;
 });
 */
+export const UPDATEEMAIL = async (newEmail = "") => {
+  try {
+    onAuthStateChanged(auth, (user) => {
+      updateEmail(user, newEmail);
+    });
+    return "Email updated successfully";
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
+export const SIGNOUT = () => {
+  signOut(auth)
+    .then(() => {
+      // Sign-out successful.
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const LOGIN = async (Email, Password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      Email,
+      Password
+    );
+    return userCredential.user;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const NEWUSER = async (Email, Password) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      Email,
+      Password
+    );
+    const user = userCredential.user;
+    return user;
+  } catch (error) {
+    throw error.message;
+  }
+};
+export const DELETEUSER = async (id) => {
+  const userToDelete = await GETDOC("users", id);
+  await SETDOC("users", id, { ...userToDelete, deleteUser: true });
+  try {
+    return "user Deleted";
+  } catch (error) {
+    throw error.message;
+  }
+};
+export const DELETECURRENTUSER = async () => {
+  const user = auth.currentUser;
+  deleteUser(user).catch((error) => {
+    console.log(error);
+  });
+};
+export const RESETPASSWORD = (email) => {
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      // Email sent.
+      console.log("Password reset email sent successfully");
+    })
+    .catch((error) => {
+      console.log(error);
+      // An error happened.
+    });
+};
 export const GETDOC = async (collection = String, id = Number) => {
   try {
     const docSnap = await getDoc(doc(db, collection, id.toString()));
@@ -71,7 +154,7 @@ export const SETDOC = async (
   }
   const res = await GETDOC(collection, id);
   if (res === "Error") {
-    throw new Error("No data found");
+    throw new Error(`No data found in ${collection} with the id of ${id}`);
   } else {
     await setDoc(doc(db, collection, id.toString()), newValue);
   }
@@ -82,7 +165,7 @@ export const DELETEDOC = async (collection = String, id = Number) => {
   try {
     await deleteDoc(doc(db, collection, id.toString()));
   } catch (error) {
-    return error;
+    console.log(error);
   }
 };
 export function productDistributor(productList = [], CategoryContainer = []) {

@@ -1,0 +1,66 @@
+.card {
+  color: white;
+  text-decoration: none;
+  gap: 30px;
+  background-color: transparent !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 200px;
+  min-height: 310px;
+  border: none !important;
+  padding: 10px;
+  --b: 2px; /* the border thickness*/
+  --g: 5px; /* the gap */
+  --c: #ed1a4e; /* the color */
+}
+.card:hover {
+  color: #f04670;
+}
+.card .Stock {
+  position: absolute;
+  top: -10px;
+  left: 0;
+}
+.CardRating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.CardRating img {
+  width: 12px;
+}
+.swiper-pagination-bullet {
+  background: #f04670 !important;
+}
+.swiper-wrapper {
+  margin-bottom: 30px;
+}
+.card img {
+  border-radius: 15px;
+  max-width: 100%;
+  max-height: 150px;
+}
+
+.card-title {
+  min-height: 50px;
+}
+.card-img-top {
+  max-height: 150px;
+  min-height: 150px;
+}
+.card .card-body {
+  padding: 0;
+}
+.card-body .Stock {
+  scale: 0.9;
+  margin: 20px auto;
+  font-weight: 500;
+}
+.card h5 {
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+}

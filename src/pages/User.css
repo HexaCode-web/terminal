@@ -1,0 +1,108 @@
+.ViewUser {
+  display: flex;
+  width: 100vw;
+  height: 98vh;
+  flex-direction: column;
+  margin-top: 90px;
+}
+.ViewUser h3 {
+  margin-left: 20px;
+}
+.ViewUser .Content {
+  width: 100%;
+  justify-content: left;
+  display: flex;
+  height: 90%;
+}
+.ViewUser .Content .Left {
+  z-index: 100;
+  display: flex;
+  height: fit-content;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-left: 30px;
+  width: 20%;
+  padding: 15px;
+  padding-bottom: 50px;
+  border-right: 1px solid #ed1a4e;
+  border-left: 1px solid #ed1a4e;
+  border-radius: 20px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+.ViewUser .Content .Left:hover {
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+}
+.ViewUser .Content .Left .UserName {
+  font-size: 1.4rem;
+  margin-bottom: 0;
+}
+.ViewUser .Content .Left .Email {
+  text-align: left;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+.ViewUser .Content .Left .Navigation {
+  list-style: none;
+  margin-top: 40px;
+}
+.ViewUser .Content .Left .Navigation li {
+  cursor: pointer;
+  margin: 10px 0;
+  transition: 0.2s all;
+}
+.ViewUser .Content .Left .Navigation li:hover {
+  color: #ed1a4e;
+}
+.ViewUser .Content .Right {
+  display: flex;
+  width: 70%;
+}
+.ViewUser .Content .Right .Card {
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ed1a4e;
+  border-radius: 20px;
+  padding: 30px;
+  transition: 0.5s all;
+}
+.ViewUser .Content .Right .Card p {
+  margin: 0;
+}
+.ViewUser .Content .Right .Card .SubText {
+  font-size: 0.8rem;
+
+  opacity: 0.7;
+}
+.ViewUser .Content .Right .Card:hover {
+  scale: 1.1;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+}
+.ViewUser .Content .Right .Card-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
+  align-items: center;
+}
+.ViewUser .Content .Right .Card .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ViewUser .Content .Right .Card .header p {
+  margin-bottom: 10px;
+  font-weight: bolder;
+}
+.ViewUser .Content .Right .Card .header img {
+  width: 24px;
+}
+p {
+  text-align: center;
+}
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,0 +1,11 @@
+.Content {
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  width: 95%;
+  margin: 30px auto;
+  gap: 30px;
+}
+.Content h2 {
+  font-weight: 300;
+}

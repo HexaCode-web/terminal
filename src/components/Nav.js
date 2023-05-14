@@ -1,37 +1,71 @@
 import React, { useEffect, useState } from "react";
-import logo from "../assets/logo2.png";
-import Logout from "../assets/logout.png";
 import secureLocalStorage from "react-secure-storage";
-import { CreateToast } from "../App";
+
+import Icons from "./HandleIconChange";
+import HoverProfile from "../assets/login-hover.png";
+import NormalProfile from "../assets/login.png";
+import HoverCart from "../assets/cart-hover.png";
+import NormalCart from "../assets/cart.png";
+import HoverWish from "../assets/heart-hover.png";
+import NormalWish from "../assets/heart.png";
+import HoverSettings from "../assets/settings-hover.png";
+import NormalSettings from "../assets/settings.png";
+import HoverSearch from "../assets/search-hover.png";
+import NormalSearch from "../assets/search.png";
+import HoverLogout from "../assets/logout-hover.png";
+import NormalLogout from "../assets/logout.png";
+import HoverDashboard from "../assets/dashboard-hover.png";
+import NormalDashboard from "../assets/dashboard.png";
+import "./Nav.css";
 import { GETCOLLECTION, GETDOC, SETDOC } from "../server";
 export default function Nav(props) {
+  const [ShowDropDown, setShowDropDown] = React.useState(false);
   const [CartCount, setCartCount] = React.useState();
+  const [logo, setLogo] = React.useState("");
   useEffect(() => {
-    GETDOC("users", props.activeUser.id).then((user) =>
-      setCartCount(user.CartCount)
-    );
+    const UpdateNumber = async () => {
+      await GETDOC("users", props.activeUser.id).then((res) =>
+        setCartCount(res.CartCount)
+      );
+    };
+    UpdateNumber();
   }, [props.UpdateCart]);
   const [showSearch, setShowSearch] = useState(false);
-  const ClearActive = async () => {
+  const logOut = async () => {
     let cleanData = [];
     await GETCOLLECTION("users").then((response) => {
       cleanData = response;
     });
-    cleanData.forEach((User) => {
+    cleanData.forEach(async (User) => {
       if (User.Username === props.activeUser.Username) {
         User.Active = false;
       }
-      SETDOC("users", User.id, { ...User });
+      await SETDOC("users", User.id, { ...User });
+      secureLocalStorage.clear();
+      window.location.href = "/";
     });
   };
-  const logOut = async () => {
-    await ClearActive();
-    secureLocalStorage.clear();
-    setTimeout(() => {
-      window.location.replace("/");
-    }, 500);
-  };
 
+  useEffect(() => {
+    if (!props.activeUser.admin) {
+      document.getElementById("itemThree").addEventListener("click", () => {
+        if (props.activeUser) {
+          setShowDropDown((prev) => !prev);
+        } else {
+          window.location.href = "/User";
+        }
+      });
+    } else {
+      return;
+    }
+  }, []);
+  useEffect(() => {
+    const GetLogo = async () => {
+      const logo = await GETDOC("websiteData", "icon");
+      setLogo(logo.icon);
+    };
+    GetLogo();
+  }, []);
   return (
     <>
       <div className="Nav">
@@ -53,60 +87,81 @@ export default function Nav(props) {
           </div>
           <ul>
             {window.location.pathname === "/" ? (
-              <button
-                className="item itemFour"
+              <Icons
+                className="item"
+                defaultSrc={NormalSearch}
+                hoverSrc={HoverSearch}
                 onClick={() => {
                   setShowSearch((prev) => !prev);
                 }}
-              ></button>
+              />
             ) : (
               ""
             )}
-            {props.activeUser.admin ? (
-              ""
-            ) : (
-              <>
-                <div style={{ position: "relative" }}>
-                  {CartCount > 0 ? (
-                    <div className="CartCounter">{CartCount}</div>
-                  ) : (
-                    ""
-                  )}
-                  <div
-                    style={{ cursor: "pointer" }}
+            <div className="dropDown-wrapper">
+              {props.activeUser.admin ? (
+                <Icons
+                  className="item"
+                  defaultSrc={NormalDashboard}
+                  hoverSrc={HoverDashboard}
+                  onClick={() => {
+                    window.location.href = "/Dashboard";
+                  }}
+                />
+              ) : (
+                <img
+                  className="item"
+                  id="itemThree"
+                  src={ShowDropDown ? HoverProfile : NormalProfile}
+                ></img>
+              )}
+
+              {ShowDropDown && (
+                <div className="DropDown">
+                  <div style={{ position: "relative" }}>
+                    {CartCount > 0 ? (
+                      <div className="CartCounter">{CartCount}</div>
+                    ) : (
+                      ""
+                    )}
+                    <Icons
+                      className="item"
+                      defaultSrc={NormalCart}
+                      hoverSrc={HoverCart}
+                      onClick={() => {
+                        window.location.href = "/Cart";
+                      }}
+                    />
+                  </div>
+                  <Icons
                     className="item"
-                    id="itemOne"
-                    href="#"
+                    defaultSrc={NormalWish}
+                    hoverSrc={HoverWish}
                     onClick={() => {
-                      props.activeUser
-                        ? props.setShowCart((prev) => !prev)
-                        : CreateToast("You Aren't Signed in!", "error");
+                      window.location.href = "/User";
                     }}
-                  ></div>
+                  />
+                  <Icons
+                    className="item"
+                    defaultSrc={NormalSettings}
+                    hoverSrc={HoverSettings}
+                    onClick={() => {
+                      window.location.href = "/User/Settings";
+                    }}
+                  />
                 </div>
-                <a className="item" id="itemTwo" href="/User"></a>
-              </>
-            )}
-            <a className="item" id="itemThree" href="/User"></a>
+              )}
+            </div>
             {props.activeUser && (
               <>
-                {!props.activeUser.admin && (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    className="item"
-                    id="itemFive"
-                    onClick={() => {
-                      window.location.replace("/User/Settings");
-                    }}
-                  ></div>
-                )}
-                <div
+                <Icons
                   className="item"
-                  style={{ cursor: "pointer" }}
-                  onClick={logOut}
-                >
-                  <img src={Logout}></img>
-                </div>
+                  defaultSrc={NormalLogout}
+                  hoverSrc={HoverLogout}
+                  onClick={() => {
+                    logOut();
+                  }}
+                />
               </>
             )}
           </ul>

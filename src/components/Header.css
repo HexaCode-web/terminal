@@ -1,0 +1,73 @@
+.Header h1 {
+  font-style: normal;
+}
+.Header h2,
+.productReview h4 {
+  font-weight: 400;
+  text-align: center;
+}
+.bg-img {
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  position: absolute;
+  height: 100%;
+  /* background-image: url(../assets/banner2.jpg); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(7px);
+}
+.Header {
+  position: relative;
+  margin: 30px auto;
+  width: 95vw;
+  min-height: 450px;
+  height: 450px;
+}
+.HeaderContent {
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  padding-top: 50px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  z-index: 2;
+}
+
+.Category-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
+  justify-content: center;
+  align-items: center;
+  row-gap: 50px;
+  column-gap: 20px;
+  margin: 50px auto;
+  list-style: none;
+}
+.Category {
+  --s: 150px; /* the size of the image */
+  --b: 3px; /* the border thickness*/
+  --g: 5px; /* the gap */
+  --c: #ed1a4e; /* the color */
+  width: var(--s);
+  aspect-ratio: 1;
+  outline: calc(var(--s) / 2) solid rgba(0, 0, 0, 0.39);
+  outline-offset: calc(var(--s) / -2);
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 15px;
+}
+.Category:hover {
+  outline: var(--b) solid var(--c);
+  outline-offset: var(--g);
+}
+.Category img {
+  border-radius: 20px;
+  max-width: 150px;
+  max-height: 200px;
+  min-height: 150px;
+}

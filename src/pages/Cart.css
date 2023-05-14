@@ -1,0 +1,150 @@
+.Cart {
+  display: flex;
+  flex-direction: column;
+  margin-top: 60px;
+}
+.Cart h1 {
+  text-align: left;
+}
+.CartList {
+  margin-top: 60px;
+  margin-left: 60px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.CartList .CartItem {
+  animation-duration: 1s;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 1px solid #ed1a4e;
+  border-radius: 15px;
+}
+.CartItem .Thumbnail {
+  max-width: 120px;
+  min-height: 120px;
+  border-radius: 50%;
+}
+.CartItem p {
+  max-width: 120px;
+  text-align: left;
+}
+.CartItem .Buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.CartItem p {
+  margin-top: 15px;
+}
+.CartItem .Buttons .button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.CartItem .Buttons button {
+  color: white;
+  border: none;
+  background-color: transparent;
+}
+.CartItem .Delete {
+  position: static;
+}
+.EmptyCart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+.EmptyCart img {
+  width: 250px;
+}
+
+.Cart .SideMenuButton {
+  cursor: pointer;
+  z-index: 998;
+  background-color: #383735;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  width: fit-content;
+  padding: 10px;
+  rotate: 270deg;
+  position: fixed;
+  right: -30px;
+  transition: all 0.6s ease;
+  top: 60%;
+}
+.Cart .SideMenuButton:hover {
+  background-color: #ed1a4e;
+  transform: scale(1.05);
+}
+.Cart .SideMenu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 600px;
+  height: 100%;
+  background-color: transparent;
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  padding-top: 60px;
+  padding-left: 60px;
+  transition: right 0.5s ease-in-out; /* only transition the right property */
+  z-index: 998;
+}
+.Cart .Below {
+  z-index: 995 !important;
+}
+.Cart .button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+  margin: 20px auto;
+  align-items: center;
+}
+.Cart .button-wrapper .SideMenuButton {
+  color: white;
+  border: none;
+  rotate: 0deg;
+  position: static;
+  top: 0;
+  right: 0;
+}
+.Cart .ShowSideMenu {
+  right: 0;
+}
+.Cart .ShowSideMenuButton {
+  right: 570px !important;
+}
+.Cart .pricing {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.Cart .pricing .fieldWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+.Cart .pricing .fieldWrapper:nth-of-type(3) {
+  position: relative;
+}
+.Cart .pricing .fieldWrapper:nth-of-type(3)::after {
+  content: "";
+  top: -5px;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: white;
+}

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import Card from "./Card";
 import { useParams } from "react-router-dom";
-
+import "./ProductList.css";
 export default function ProductList(props) {
   console.log(props);
   const id = useParams().ID;

@@ -7,11 +7,13 @@ import { v4 as uid } from "uuid";
 
 import Card from "../components/Card";
 export default function HottestProducts(props) {
+  let delay = 0;
   const HotProducts = props.ProductList.map((product) => {
+    delay += 0.1;
     if (product.HotProduct) {
       return (
         <SwiperSlide key={uid()}>
-          <Card product={product} />
+          <Card product={product} Delay={delay.toString()} />
         </SwiperSlide>
       );
     }

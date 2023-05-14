@@ -1,0 +1,127 @@
+.Nav  /* nav wrapper*/ {
+  position: fixed;
+  z-index: 3;
+  backdrop-filter: blur(5px);
+  width: 99%;
+}
+
+.nav {
+  position: relative;
+  z-index: 4;
+  margin: 0 30px;
+  padding-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav ul {
+  align-items: center;
+  margin-bottom: 0;
+  display: flex;
+  gap: 20px;
+}
+.CartCounter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: -5px;
+  top: -5px;
+  position: absolute;
+  background-color: red;
+  font-size: 10px;
+  font-weight: bolder;
+  border-radius: 50%;
+  height: 15px;
+  width: 15px;
+}
+.search-wrapper {
+  display: flex;
+  opacity: 0;
+  scale: 0;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  width: 280px;
+  background-color: white;
+  border-radius: 30px;
+  height: 40px;
+  transition: 0.5s all;
+}
+.animate {
+  scale: 1;
+  opacity: 1;
+  transform-origin: bottom right 60px;
+}
+.search-wrapper input {
+  border: none;
+  text-indent: 20px;
+  border-radius: 30px;
+  width: 240px;
+  margin: auto;
+  height: 40px;
+  transition: 0.5s all;
+}
+.search-wrapper input:focus {
+  outline: none;
+}
+.search-wrapper .itemFour {
+  right: 13px;
+  position: absolute;
+  background-image: url(../assets/search-hover.png);
+}
+
+.item {
+  cursor: pointer;
+  display: block;
+  width: 25px;
+  height: 25px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.dropDown-wrapper {
+  position: relative;
+}
+.dropDown-wrapper .DropDown {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  position: absolute;
+  left: -50%;
+  top: 30px;
+  width: 50px;
+  height: 150px;
+
+  border: 1px solid #9b1e2b;
+  border-radius: 15px;
+  animation: BounceIn 1s;
+}
+@keyframes BounceIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -3000px, 0) scaleY(3);
+    transform: translate3d(0, -40px, 0);
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 25px, 0) scaleY(0.9);
+    transform: translate3d(0, 25px, 0) scaleY(0.9);
+  }
+  75% {
+    -webkit-transform: translate3d(0, -10px, 0) scaleY(0.95);
+    transform: translate3d(0, -10px, 0) scaleY(0.95);
+  }
+  90% {
+    -webkit-transform: translate3d(0, 5px, 0) scaleY(0.985);
+    transform: translate3d(0, 5px, 0) scaleY(0.985);
+  }
+  100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.nav .logo {
+  width: 75px;
+}

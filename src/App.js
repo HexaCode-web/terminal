@@ -7,12 +7,17 @@ import Content from "./components/Content";
 import SearchResult from "./components/SearchResult";
 import ProductList from "./components/ProductList";
 import ProductDetails from "./pages/ProductDetails";
-import Cart from "./components/Cart";
+import Cart from "./pages/Cart";
 import User from "./pages/User";
-import Settings from "./components/UserSettings";
+import History from "./pages/History";
+import Pending from "./pages/Pending";
+import Settings from "./pages/UserSettings";
+import ViewUser from "./components/Dashboard/ViewUser";
+import loadingDark from "./assets/loadingDark.gif";
+
 import { Routes, Route } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
-import EditProduct from "./pages/EditProduct";
+import EditProduct from "./components/Dashboard/EditProduct";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GETCOLLECTION, GETDOC, SETDOC } from "./server";
@@ -48,31 +53,48 @@ export const CreateToast = (text, type, duration = 5000) => {
   });
 };
 export default function App() {
+  const [Loading, setLoading] = React.useState(false);
   const [activeUser, setActiveUser] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser")) || ""
   );
-  const [showCart, setShowCart] = React.useState(false);
   const [Data, SetData] = React.useState([]);
   const [filteredData, setFilteredData] = React.useState([]);
   const [catagories, setCatagories] = React.useState([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [UpdateCart, setUpdateCart] = React.useState(0);
+  const [WebsiteData, setWebsiteData] = React.useState({
+    title: "",
+  });
+
   async function GetData() {
+    setLoading(true);
+    await GETDOC("websiteData", "title").then((res) =>
+      setWebsiteData((prev) => {
+        return { ...prev, title: res.title };
+      })
+    );
     await GETCOLLECTION("categories").then((res) => {
       setCatagories(res);
     });
     await GETCOLLECTION("products").then((res) => SetData(res));
+    setLoading(false);
   }
-
-  const UpdateUser = async (targetUser, ChangePass, NewPassword = " ") => {
-    CreateToast("updating", "info", 1000);
+  const UpdateUser = async (
+    targetUser,
+    ChangePass,
+    NewPassword = "",
+    popups
+  ) => {
     if (!ChangePass) {
       try {
         await SETDOC("users", targetUser.id, { ...targetUser });
         secureLocalStorage.setItem("activeUser", JSON.stringify(targetUser));
-        CreateToast("your changes have been saved", "success", 3000);
+        popups
+          ? CreateToast("your changes have been saved", "success", 3000)
+          : "";
       } catch (error) {
-        CreateToast("something went wrong", "error", 3000);
+        console.log(error);
+        popups ? CreateToast("something went wrong", "error", 3000) : "";
       }
     } else {
       try {
@@ -109,9 +131,18 @@ export default function App() {
     );
   };
   useEffect(() => {
+    document.title = WebsiteData.title;
+  }, [WebsiteData]);
+  useEffect(() => {
     GetData();
   }, []);
-
+  useEffect(() => {
+    if (UpdateCart === 0) {
+      GETDOC("users", activeUser.id).then((res) =>
+        setUpdateCart(res.CartCount)
+      );
+    }
+  }, [UpdateCart]);
   return (
     <div className="App">
       <ToastContainer
@@ -126,20 +157,19 @@ export default function App() {
         pauseOnHover
         theme="dark"
       />
+      {Loading ? (
+        <div className="overlay LoadingMain">
+          <img src={loadingDark} />
+        </div>
+      ) : (
+        ""
+      )}
       <Nav
         handleSearch={handleSearch}
         activeUser={activeUser}
-        setShowCart={setShowCart}
         UpdateCart={UpdateCart}
       />
-      {showCart && (
-        <Cart
-          activeUser={activeUser}
-          setActiveUser={setActiveUser}
-          updateUser={UpdateUser}
-          setUpdateCart={setUpdateCart}
-        />
-      )}
+
       <Routes>
         <Route
           path="/"
@@ -152,7 +182,7 @@ export default function App() {
               ) : (
                 <div>
                   <Header List={Data} catagories={catagories} />
-                  <Content List={Data} />
+                  <Content />
                 </div>
               )}
             </>
@@ -181,8 +211,18 @@ export default function App() {
             <ProductDetails
               updateUser={UpdateUser}
               Items={Data}
-              setShowCart={setShowCart}
               UpdateCart={UpdateCart}
+              setUpdateCart={setUpdateCart}
+            />
+          }
+        ></Route>
+        <Route
+          path="/Cart"
+          element={
+            <Cart
+              activeUser={activeUser}
+              setActiveUser={setActiveUser}
+              updateUser={UpdateUser}
               setUpdateCart={setUpdateCart}
             />
           }
@@ -192,7 +232,13 @@ export default function App() {
           element={<DashBoard Data={Data} UpdateUser={UpdateUser} />}
         ></Route>
         <Route path="/Dashboard/product/:ID" element={<EditProduct />}></Route>
+        <Route
+          path="/Dashboard/User/:ID"
+          element={<ViewUser activeUser={activeUser} />}
+        ></Route>
         <Route path="User" element={<User />}></Route>
+        <Route path="User/Pending" element={<Pending />}></Route>
+        <Route path="User/History" element={<History />}></Route>
         <Route
           path="User/Settings"
           element={<Settings UpdateUser={UpdateUser} />}

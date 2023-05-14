@@ -1,0 +1,18 @@
+.Banner {
+  width: 90%;
+  margin: auto;
+  gap: 30px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.Banner .MainImg {
+  width: 90%;
+  border-radius: 15px;
+}
+.mySwiper {
+  width: 100%;
+  overflow: hidden;
+}

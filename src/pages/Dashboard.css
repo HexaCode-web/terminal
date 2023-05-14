@@ -1,0 +1,247 @@
+.Dashboard {
+  margin-top: 70px;
+  display: flex;
+  width: 106vw;
+  height: auto;
+}
+.Dashboard .SideBar {
+  margin-top: 15px;
+  border-right: 1px solid #ee233a;
+  width: 12%;
+}
+.Dashboard .SideBar .Greet {
+  font-size: 20px;
+  position: relative;
+  margin-bottom: 60px;
+  text-align: center;
+}
+.Dashboard .SideBar .Greet::after,
+.Dashboard .SideBar .Greet::before {
+  content: "";
+  background-color: #ee233a;
+  width: 50%;
+  height: 1px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: -20px;
+}
+.Dashboard .SideBar .Greet::before {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  bottom: -25px;
+}
+.Dashboard .Main {
+  width: 80%;
+}
+.Dashboard .BTNList {
+  list-style: none;
+  padding: 0;
+}
+.Dashboard .BTNList span {
+  opacity: 0.7;
+  padding-left: 20px;
+  text-align: left;
+  font-size: 12px;
+}
+.Dashboard .BTNList ul {
+  list-style: none;
+  padding: 0;
+}
+.Dashboard .BTNList li {
+  margin: 15px 0;
+}
+.Dashboard .BTNList h3:hover {
+  color: #ee233a;
+}
+.Dashboard .BTNList h3 {
+  cursor: pointer;
+  text-align: left;
+  padding-left: 30px;
+  font-size: 15px;
+  transition: 0.3s all;
+}
+.Dashboard .Cards-wrapper {
+  border-radius: 15px;
+  margin: 10px;
+  padding: 20px;
+  border: 1px solid white;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  height: fit-content;
+  gap: 20px;
+  text-align: center;
+  width: 90%;
+}
+.Charts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  grid-area: chart;
+  width: fit-content;
+}
+.Progress {
+  flex-direction: column;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 300px;
+  height: 400px;
+
+  border-radius: 15px;
+  border: 1px solid white;
+  padding: 20px;
+}
+.Progress .SideNumbers {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.Progress .SideNumbers p {
+  text-align: center;
+  font-size: 0.8rem;
+}
+.Progress .SideNumbers span {
+  text-align: center;
+}
+.Charts .Chart {
+  border-radius: 15px;
+  border: 1px solid white;
+  padding: 20px;
+  min-width: 500px;
+  max-width: 500px;
+  min-height: 400px;
+  max-height: 400px;
+}
+.Progress .Chart {
+  border: none !important;
+  padding: 0 !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  min-height: 200px !important;
+  max-height: 200px !important;
+}
+.DashBoardInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.Notes {
+  width: 90%;
+  border-radius: 15px;
+  margin: 10px;
+  border: 1px solid white;
+  grid-area: notes;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.Notes input {
+  padding: 0 10px;
+  width: 80%;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-bottom: 2px solid #ee233a;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.Notes input:focus {
+  outline: none;
+}
+.Notes button {
+  color: white;
+  border: 1px solid #ee233a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  width: 120px;
+  height: 30px;
+  cursor: pointer;
+  transition: 0.2s all;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.Notes .note-wrapper {
+  width: 95%;
+
+  padding: 10px;
+}
+.Notes .note-wrapper .Note {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid white;
+}
+.Notes .note-wrapper .Note p {
+  margin: 10px;
+}
+.Note img {
+  cursor: pointer;
+  max-width: 20px;
+  max-height: 20px;
+}
+.Notes button:hover {
+  color: white;
+  cursor: pointer;
+  scale: 1.1;
+  background-color: #ee233a;
+}
+.Notes .input-wrapper {
+  gap: 20px;
+  align-items: center;
+  display: flex;
+  height: 40px;
+}
+.Dashboard .Card {
+  min-height: 100px;
+  display: flex;
+  padding: 15px;
+  border-radius: 15px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  min-width: 250px;
+  border: 1px solid #ee233a;
+  transition: 0.2s all;
+}
+.Dashboard .Card:hover {
+  scale: 1.06;
+}
+
+.Dashboard .Card .counter-wrapper {
+  min-height: 32px;
+}
+.ActiveLink {
+  padding-left: 0px !important;
+  text-align: center !important;
+  color: #ee233a;
+}
+.Loading {
+  width: 22px;
+}
+.Inactive {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.726);
+  z-index: 10000;
+}
+.Inactive img {
+  width: 200px;
+}

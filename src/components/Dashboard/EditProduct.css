@@ -1,0 +1,219 @@
+.EditProduct {
+  margin-top: 60px;
+  height: 80%;
+}
+
+.EditProduct label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.EditProduct input[type="text"],
+.EditProduct input[type="number"],
+.EditProduct input[type="checkbox"],
+.EditProduct textarea {
+  color: white;
+  width: 100%;
+  padding: 10px;
+  background-color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+.EditProduct input[type="text"]:focus,
+.EditProduct input[type="number"]:focus,
+.EditProduct input[type="checkbox"]:focus {
+  border: none;
+}
+.EditProduct select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+.EditProduct textarea {
+  height: 150px;
+}
+.EditProduct input[type="submit"] {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.EditProduct .Images {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+}
+.EditProduct .MainIMG {
+  max-width: 400px;
+  border-radius: 15px;
+  max-height: 400px;
+}
+.EditProduct .form-group {
+  width: 90%;
+}
+.EditProduct .ProductInfo {
+  padding: 15px;
+  margin: 20px auto;
+  border: 1px solid white;
+  gap: 10px;
+  grid-template-areas:
+    "Title Brand"
+    "Category Stock"
+    "Description Description"
+    "Offer  Discount"
+    "Cost Price"
+    "Hot-product Hot-product"
+    "Submit Delete";
+}
+.EditProduct #Title {
+  grid-area: Title;
+}
+.EditProduct #Brand {
+  grid-area: Brand;
+}
+.EditProduct #Category {
+  grid-area: Category;
+}
+.EditProduct #Description {
+  grid-area: Description;
+}
+.EditProduct #Stock {
+  position: relative;
+  grid-area: Stock;
+}
+.EditProduct #Stock p,
+.EditProduct #Discount p {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.EditProduct #Offer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  grid-area: Offer;
+}
+.EditProduct #Discount {
+  position: relative;
+  grid-area: Discount;
+}
+.EditProduct #Cost {
+  grid-area: Cost;
+}
+
+.EditProduct #Price {
+  grid-area: Price;
+}
+.EditProduct #Submit {
+  grid-area: Submit;
+}
+.EditProduct #Delete {
+  grid-area: Delete;
+}
+.EditProduct #Hot-product {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  grid-area: Hot-product;
+}
+.EditProduct input[type="submit"]:hover {
+  background-color: #45a049;
+}
+.EditProduct .ThumbPhotos {
+  display: flex;
+  gap: 40px;
+}
+.EditProduct .ThumbPhotos .thumb {
+  padding: 0;
+  border-radius: 15px;
+  width: 100px;
+  height: 100px;
+}
+.EditProduct .ThumbPhotos .thumb img {
+  border-radius: 15px;
+  width: 100px;
+  height: 100px;
+}
+
+.EditProduct form {
+  display: grid;
+  gap: 50px;
+  margin: 30px auto;
+  padding: 20px 0;
+  border-radius: 15px;
+  place-items: center;
+  width: 80%;
+  grid-template-areas:
+    "Fname Lname"
+    "Username Phone"
+    "Email Email"
+    "Address  Address"
+    "Gender DOB"
+    "Save Save";
+}
+.EditProduct button {
+  margin-top: 20px;
+  margin-left: 10px;
+}
+.EditProduct .Section2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.EditProduct .Section2 .OtherInfo {
+  padding: 20px 0;
+  margin: 30px 0;
+  border: 1px solid white;
+  border-radius: 15px;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  width: 80%;
+  place-items: center;
+}
+.EditProduct .addPhoto {
+  border: 1px solid white;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto 0;
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+}
+.EditProduct .addPhoto img {
+  width: 60%;
+  height: 60%;
+}
+.EditProduct .ButtonWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.EditProduct .Delete {
+  width: fit-content;
+}
+.EditProduct .Thumbnail:hover {
+  background-color: #0275d8;
+  border-radius: 5px;
+}
+.EditProduct .Delete:hover {
+  background-color: #d9534f;
+  border-radius: 5px;
+}
