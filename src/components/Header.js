@@ -10,6 +10,7 @@ export default function Header(props) {
     subtitle: "",
     background: "",
   });
+  console.log(WebsiteData.subtitle);
   const [loading, setLoading] = React.useState(false);
   useEffect(() => {
     setTimeout(() => {
@@ -60,13 +61,9 @@ export default function Header(props) {
         <h1 className="animate__animated animate__fadeInDown">
           {WebsiteData.headline}
         </h1>
-        {Object.keys(useParams()).length === 0 ? (
-          <h4 className="animate__animated animate__fadeInUp">
-            {WebsiteData.subtitle}
-          </h4>
-        ) : (
-          ""
-        )}
+        <h4 className="animate__animated animate__fadeInUp">
+          {WebsiteData.subtitle}
+        </h4>
         {loading && <ul className="Category-wrapper">{element}</ul>}{" "}
       </div>
     </div>

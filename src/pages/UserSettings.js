@@ -52,7 +52,7 @@ export default function Settings(props) {
         CreateToast(error.message, "error");
       }
     }
-    props.UpdateUser(userToSend, false, "", false);
+    props.UpdateUser(userToSend, false);
     OldEmail = JSON.parse(secureLocalStorage.getItem("activeUser")).email;
   };
   const handleShowModal = () => setShowModal(true);

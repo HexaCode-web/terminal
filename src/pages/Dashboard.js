@@ -18,7 +18,6 @@ import AdminProfile from "../components/Dashboard/AdminProfile";
 import WebSettings from "../components/Dashboard/WebSettings";
 ChartJS.register(ArcElement, Tooltip, Legend);
 import Widget from "../components/Dashboard/Widget";
-import ProductList from "../components/SearchResult";
 export default function DashBoard(props) {
   const [ActiveUser, setActiveUser] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser"))
@@ -46,7 +45,7 @@ export default function DashBoard(props) {
   const [activePage, setActivePage] = React.useState("Overview");
   const [chartData, setChartData] = React.useState(null);
   const [Notes, setNotes] = React.useState([]);
-  const pattern = date.compile("ddd, MMM DD YYYY, HH:mm:ss");
+
   /*GETTING NUMBERS*/
   const fetchNumbers = async () => {
     let catagoriesLocal = {};
@@ -187,6 +186,7 @@ export default function DashBoard(props) {
         ...Notes,
       ],
     };
+    document.querySelector("#NoteValue").value = "";
     await SETDOC("statistics", 0, { ...tempData });
     await GETDOC("statistics", 0).then((res) => {
       setNotes(res.notes);
@@ -220,6 +220,7 @@ export default function DashBoard(props) {
     if (new Date().getHours() < 12) setGreeting("Good morning");
     else if (new Date().getHours() < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
+    document.title = `${document.title} | Dashboard`;
   }, []);
   useEffect(() => {
     if (!(Object.keys(statistics).length === 0)) {
@@ -604,8 +605,8 @@ export default function DashBoard(props) {
                 setActivePage={setActivePage}
               />
             </div>
+            <h3>Notes</h3>
             <div className="Notes animate__animated animate__backInUp">
-              <h3>Notes</h3>
               <div className="input-wrapper">
                 <input
                   type="text"

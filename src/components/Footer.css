@@ -1,0 +1,81 @@
+.FooterWrapper {
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  margin-top: 100px;
+}
+.FooterWrapper p {
+  text-align: unset;
+}
+.FooterWrapper a {
+  color: #ee233a;
+  text-decoration: none;
+  transition: 0.2s all;
+}
+.FooterWrapper a:hover {
+  color: white;
+}
+.FooterWrapper ul {
+  list-style: none;
+  padding-left: 0;
+}
+.columns {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.col p {
+  font-weight: bolder;
+  font-size: 1.2rem;
+}
+.field span {
+  opacity: 0.7;
+}
+.field p {
+  color: #ee233a;
+  transition: 0.2s all;
+}
+.CopyRight {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.CopyRight p {
+  margin-bottom: 0;
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+.Links {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.Links p {
+  font-weight: bolder;
+  font-size: 1.2rem;
+}
+.Links ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+.Links ul img {
+  cursor: pointer;
+  width: 30px;
+  transition: 0.2s all;
+}
+.Links ul img:hover {
+  scale: 1.1;
+}
+.CopyRight img {
+  width: 85px;
+}

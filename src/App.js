@@ -14,7 +14,7 @@ import Pending from "./pages/Pending";
 import Settings from "./pages/UserSettings";
 import ViewUser from "./components/Dashboard/ViewUser";
 import loadingDark from "./assets/loadingDark.gif";
-
+import Footer from "./components/Footer";
 import { Routes, Route } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 import EditProduct from "./components/Dashboard/EditProduct";
@@ -81,35 +81,18 @@ export default function App() {
   }
   const UpdateUser = async (
     targetUser,
-    ChangePass,
-    NewPassword = "",
+
     popups
   ) => {
-    if (!ChangePass) {
-      try {
-        await SETDOC("users", targetUser.id, { ...targetUser });
-        secureLocalStorage.setItem("activeUser", JSON.stringify(targetUser));
-        popups
-          ? CreateToast("your changes have been saved", "success", 3000)
-          : "";
-      } catch (error) {
-        console.log(error);
-        popups ? CreateToast("something went wrong", "error", 3000) : "";
-      }
-    } else {
-      try {
-        await SETDOC("users", targetUser.id, {
-          ...targetUser,
-          Password: NewPassword,
-        });
-        secureLocalStorage.setItem(
-          "activeUser",
-          JSON.stringify({ targetUser, Password: NewPassword })
-        );
-        CreateToast("your changes have been saved", "success");
-      } catch (error) {
-        CreateToast("something went wrong", "error");
-      }
+    try {
+      await SETDOC("users", targetUser.id, { ...targetUser });
+      secureLocalStorage.setItem("activeUser", JSON.stringify(targetUser));
+      popups
+        ? CreateToast("your changes have been saved", "success", 3000)
+        : "";
+    } catch (error) {
+      console.log(error);
+      popups ? CreateToast("something went wrong", "error", 3000) : "";
     }
   };
   const handleSearch = (event) => {
@@ -222,7 +205,6 @@ export default function App() {
             <Cart
               activeUser={activeUser}
               setActiveUser={setActiveUser}
-              updateUser={UpdateUser}
               setUpdateCart={setUpdateCart}
             />
           }
@@ -244,6 +226,11 @@ export default function App() {
           element={<Settings UpdateUser={UpdateUser} />}
         ></Route>
       </Routes>
+      <Footer
+        catagories={catagories}
+        activeUser={activeUser}
+        webName={WebsiteData.title}
+      />
     </div>
   );
 }

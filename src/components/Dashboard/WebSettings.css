@@ -30,18 +30,18 @@ section {
   justify-content: space-between;
   align-items: center;
 }
-.IconEdit .formItem {
+.formItem {
   display: flex;
-  flex-direction: row;
+  flex-direction: row !important;
   justify-content: center;
   align-items: center;
 }
-.IconEdit input {
+input {
   text-indent: 10px;
   background-color: transparent;
   margin: 20px;
 }
-.IconEdit input:focus {
+input:focus {
   outline: none;
 }
 .HeaderEdit {
@@ -163,4 +163,7 @@ select::after {
 
 .rotate-up {
   transform: rotate(180deg);
+}
+.hidden {
+  display: none;
 }

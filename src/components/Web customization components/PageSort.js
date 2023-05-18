@@ -72,15 +72,19 @@ const PageSort = (props) => {
   return (
     <section className="PageSort">
       <p>
-        here you can control how your lists appear on the page keeping in mind
-        <strong>
-          {" "}
-          that number one is the top of the page after the header
-        </strong>
+        here you can control how your lists appear on the page keeping in mind{" "}
+        <strong>that number one is the top of the page after the header</strong>
       </p>
       <span>(if one of the extra lists is hidden it will be ignored)</span>
       <div className="Selects-wrapper">{selects}</div>
-      <button className="button">Save</button>
+      <button
+        className="button"
+        onClick={() => {
+          props.Save("sec6", PageSort);
+        }}
+      >
+        Save
+      </button>
     </section>
   );
 };

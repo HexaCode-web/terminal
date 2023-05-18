@@ -55,7 +55,6 @@ export default function Content() {
       ),
     ]);
   };
-  console.log(WebsiteData.ExtraLists);
   const sortedEntries = Object.entries(WebsiteData.pageSort).sort(
     (a, b) => a[1] - b[1]
   );

@@ -294,7 +294,7 @@ export default function ViewUser() {
                   onClick={() => (window.location.href = "/User/Settings")}
                   style={{ animationDelay: ".6s" }}
                   className={`${
-                    ActivePage === "PendingOrders" ? "ActiveLink" : ""
+                    ActivePage === "Settings" ? "ActiveLink" : ""
                   } animate__animated animate__backInDown `}
                 >
                   Settings
@@ -432,7 +432,7 @@ export default function ViewUser() {
               {ActivePage === "History" ? (
                 user.history.length <= 0 ? (
                   <h4 style={{ textAlign: "center" }}>
-                    {user.Fname} {user.Lname} hasn't bought anything yet
+                    you didn't buy anything yet
                   </h4>
                 ) : (
                   <DataTable
@@ -448,7 +448,7 @@ export default function ViewUser() {
               {ActivePage === "PendingOrders" ? (
                 user.pending.length <= 0 ? (
                   <h4 style={{ textAlign: "center" }}>
-                    {user.Fname} {user.Lname} doesn't have any Pending Orders
+                    you don't have any Pending Orders
                   </h4>
                 ) : (
                   <DataTable

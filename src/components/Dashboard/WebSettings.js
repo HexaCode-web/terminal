@@ -7,12 +7,13 @@ import { CreateToast } from "../../App";
 import Carousel from "../carosuel";
 import Star from "../../assets/star-empty.png";
 import starFilled from "../../assets/star-filled.png";
-import ProductSelect from "../ProductSelect";
+import ProductSelect from "../Web customization components/ProductSelect";
 import Banner from "../Banner";
-import ExtraListEdit from "../ExtraListEdit";
+import ExtraListEdit from "../Web customization components/ExtraListEdit";
 import SliderList from "../../Sections/SliderList";
-import PageSort from "../PageSort";
+import PageSort from "../Web customization components/PageSort";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
+import FooterEdit from "../Web customization components/FooterEdit";
 
 const WebSettings = (props) => {
   const [WebData, setWebData] = React.useState({
@@ -28,6 +29,7 @@ const WebSettings = (props) => {
     title: null,
     Lists: null,
     ExtraLists: null,
+    Footer: null,
   });
   const [viewSection, setViewSection] = React.useState({
     HeaderEdit: false,
@@ -36,13 +38,13 @@ const WebSettings = (props) => {
     Banners: false,
     ExtraLists: false,
     pageSort: false,
+    FooterEdit: false,
   });
   const SortedProducts = props.productList.map((product) => ({
     value: product.id,
     label: product.title,
   }));
   const [uploadingPhoto, setUploadingPhoto] = React.useState(false);
-
   useEffect(() => {
     const FetchData = async () => {
       const fieldNames = [
@@ -58,6 +60,7 @@ const WebSettings = (props) => {
         "title",
         "Lists",
         "ExtraLists",
+        "Footer",
       ];
       const requests = fieldNames.map((fieldName) =>
         GETDOC("websiteData", fieldName)
@@ -81,6 +84,7 @@ const WebSettings = (props) => {
         title: results.title,
         Lists: results.Lists,
         ExtraLists: results.ExtraLists,
+        Footer: results.Footer,
       }));
     };
     FetchData();
@@ -163,6 +167,12 @@ const WebSettings = (props) => {
     if (section === "sec5") {
       await SETDOC("websiteData", "Lists", { Lists: WebData.Lists });
     }
+    if (section === "sec6") {
+      await SETDOC("websiteData", "pageSort", { pageSort: Data });
+    }
+    if (section === "sec7") {
+      await SETDOC("websiteData", "Footer", { Footer: Data });
+    }
     CreateToast("data Updated!", "success");
   };
   const handleProductChange = (selectedOption, source) => {
@@ -231,14 +241,14 @@ const WebSettings = (props) => {
     return <div className="reviewWrapper">{elements}</div>;
   }
   const ChangeView = (SectionToChange) => {
-    document
-      .getElementById(SectionToChange)
-      .classList.toggle("rotate-up", viewSection.SectionToChange);
-
     setViewSection((prev) => {
       return { ...prev, [SectionToChange]: !prev[SectionToChange] };
     });
+    document
+      .getElementById(SectionToChange)
+      .classList.toggle("rotate-up", viewSection.SectionToChange);
   };
+
   const extraLists = [
     { key: "ExtraOne", listNum: "First" },
     { key: "ExtraTwo", listNum: "Second" },
@@ -262,7 +272,6 @@ const WebSettings = (props) => {
       </div>
     </React.Fragment>
   ));
-
   return (
     <div className="Container">
       <div
@@ -275,7 +284,7 @@ const WebSettings = (props) => {
         <KeyboardArrowDownOutlinedIcon className="indicator" id="IconEdit" />
       </div>
       {viewSection.IconEdit && (
-        <section className="IconEdit animate__animated animate__fadeInDown">
+        <section className="IconEdit">
           <div className="Data">
             <div className="formItem">
               <span>Upload an icon: </span>
@@ -572,7 +581,27 @@ const WebSettings = (props) => {
         <KeyboardArrowDownOutlinedIcon className="indicator" id="pageSort" />
       </div>
       {viewSection.pageSort && (
-        <>{WebData.pageSort && <PageSort PageSort={WebData.pageSort} />}</>
+        <>
+          {WebData.pageSort && (
+            <PageSort PageSort={WebData.pageSort} Save={SaveData} />
+          )}
+        </>
+      )}
+      <div
+        className="Title-Wrapper"
+        onClick={() => {
+          ChangeView("FooterEdit");
+        }}
+      >
+        <h3> Footer Info</h3>
+        <KeyboardArrowDownOutlinedIcon className="indicator" id="FooterEdit" />
+      </div>
+      {viewSection.FooterEdit && (
+        <>
+          {WebData.Footer && (
+            <FooterEdit Data={WebData.Footer} Save={SaveData} />
+          )}
+        </>
       )}
     </div>
   );

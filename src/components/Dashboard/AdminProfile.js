@@ -34,7 +34,7 @@ const AdminProfile = (props) => {
     });
     if (Match) {
       userToSend = { ...ActiveUser, email: OldEmail };
-      CreateToast("email wasn't updated due to it was  taken", "error");
+      CreateToast("email wasn't updated due to it was taken", "error");
     } else {
       userToSend = ActiveUser;
       try {
@@ -44,7 +44,7 @@ const AdminProfile = (props) => {
         CreateToast(error.message, "error");
       }
     }
-    props.UpdateUser(userToSend, false, "", false);
+    props.UpdateUser(userToSend, false);
     OldEmail = JSON.parse(secureLocalStorage.getItem("activeUser")).email;
   };
   const handlePrimaryAction = async (e) => {
@@ -255,10 +255,10 @@ const AdminProfile = (props) => {
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
-                  props.UpdateUser(ActiveUser, false, "", true);
+                  props.UpdateUser(ActiveUser, true);
                 }}
                 value="Save"
-                style={{ margin: "auto", width: "50%" }}
+                style={{ margin: "auto", width: "50%", textIndent: "0" }}
               />
             </form>
           </div>

@@ -105,6 +105,7 @@ export default function ProductDetails(props) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
+      console.log(item);
       setInactive(true);
       let targetProductPlace;
       activeUser.wishlist.find((wish, index) => {

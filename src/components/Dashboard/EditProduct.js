@@ -136,19 +136,20 @@ export default function EditProduct() {
     let firstProduct;
     let SecondProduct;
     await GETDOC("websiteData", "mainProduct1").then(
-      (res) => (firstProduct = res)
+      (res) => (firstProduct = res.mainProduct1)
     );
 
     await GETDOC("websiteData", "mainProduct2").then(
-      (res) => (SecondProduct = res)
+      (res) => (SecondProduct = res.mainProduct2)
     );
 
     if (firstProduct.id == id) {
-      console.log("true");
-      await SETDOC("websiteData", "mainProduct1", { ...Product });
+      console.log(firstProduct);
+      await SETDOC("websiteData", "mainProduct1", { mainProduct1: Product });
     }
     if (SecondProduct.id == id) {
-      await SETDOC("websiteData", "mainProduct2", { ...Product });
+      console.log(SecondProduct);
+      await SETDOC("websiteData", "mainProduct2", { mainProduct2: Product });
     }
     await SETDOC("products", id, { ...Product });
     const productList = await GETCOLLECTION("products");

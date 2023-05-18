@@ -1,0 +1,24 @@
+.FooterEdit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.Address {
+  width: 100%;
+}
+.Address input {
+  width: 80%;
+}
+.Data {
+  margin: 0 auto;
+  width: 88%;
+  justify-content: space-between;
+}
+.SocialLinks {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.SocialLinks input {
+  width: 70%;
+}

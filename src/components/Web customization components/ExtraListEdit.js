@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ProductSelect from "./ProductSelect";
-import Upload from "../assets/upload.png";
-import { CreateToast } from "../App";
-import { UPLOADPHOTO } from "../server";
+import Upload from "../../assets/upload.png";
+import { CreateToast } from "../../App";
+import { UPLOADPHOTO } from "../../server";
 import "./ExtraLists.css";
 const ExtraListEdit = (props) => {
   const [List, SetList] = useState(props.List);

@@ -31,41 +31,57 @@ export default function HottestProducts() {
               id={index === 0 ? "one" : index === 1 ? "two" : ""}
               images={element.images}
             />
-            <p className="description">{element.description}</p>
-            <div>
-              <p className="OldPrice">{element.price}$</p>
-              <span>
-                Now Only For:
-                <span style={{ fontWeight: "500" }}>
-                  {element.price -
-                    Math.round(
-                      (element.price * element.discountPercentage) / 100
-                    )}
-                  $
+            <div
+              onClick={() => {
+                window.location.href = `/product/${element.id}`;
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <p className="description">{element.description}</p>
+              <div>
+                <p className="OldPrice">{element.price}$</p>
+                <span
+                  style={{
+                    textAlign: "center",
+                    display: "block",
+                    margin: "auto",
+                  }}
+                >
+                  Now Only For:
+                  <span style={{ fontWeight: "500" }}>
+                    {element.price -
+                      Math.round(
+                        (element.price * element.discountPercentage) / 100
+                      )}
+                    $
+                  </span>
                 </span>
-              </span>
-              <div className="rating">
-                <img src={rating1 >= 1 ? starFilled : Star} alt="Star"></img>
-                <img src={rating1 >= 2 ? starFilled : Star} alt="Star"></img>
-                <img src={rating1 >= 3 ? starFilled : Star} alt="Star"></img>
-                <img src={rating1 >= 4 ? starFilled : Star} alt="Star"></img>
-                <img src={rating1 >= 5 ? starFilled : Star} alt="Star"></img>
-              </div>
-              {element.stock ? (
-                element.stock < 5 ? (
-                  <p className="Stock">
-                    Only{" "}
-                    <span style={{ color: "#ee233a", fontWeight: "bolder" }}>
-                      {element.stock}
-                    </span>{" "}
-                    left!
-                  </p>
+                <div
+                  className="rating"
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <img src={rating1 >= 1 ? starFilled : Star} alt="Star"></img>
+                  <img src={rating1 >= 2 ? starFilled : Star} alt="Star"></img>
+                  <img src={rating1 >= 3 ? starFilled : Star} alt="Star"></img>
+                  <img src={rating1 >= 4 ? starFilled : Star} alt="Star"></img>
+                  <img src={rating1 >= 5 ? starFilled : Star} alt="Star"></img>
+                </div>
+                {element.stock ? (
+                  element.stock < 5 ? (
+                    <p className="Stock">
+                      Only{" "}
+                      <span style={{ color: "#ee233a", fontWeight: "bolder" }}>
+                        {element.stock}
+                      </span>{" "}
+                      left!
+                    </p>
+                  ) : (
+                    <p className="Stock">In Stock</p>
+                  )
                 ) : (
-                  <p className="Stock">In Stock</p>
-                )
-              ) : (
-                <p className="Stock out">Out of stock</p>
-              )}
+                  <p className="Stock out">Out of stock</p>
+                )}
+              </div>
             </div>
           </>
         ) : (
