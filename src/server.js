@@ -26,7 +26,6 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { firebaseConfig } from "./DBConfig.js";
-import { CreateToast } from "./App.js";
 export const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
