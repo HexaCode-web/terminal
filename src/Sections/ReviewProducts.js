@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Carousel from "../components/carosuel";
+import Carousel from "../components/Carosuel/carosuel";
 import { GETDOC } from "../server";
 import Star from "../assets/star-empty.png";
 import starFilled from "../assets/star-filled.png";

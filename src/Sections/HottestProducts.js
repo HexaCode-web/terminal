@@ -5,7 +5,7 @@ import { Pagination } from "swiper";
 import "swiper/css/pagination";
 import { v4 as uid } from "uuid";
 
-import Card from "../components/Card";
+import Card from "../components/Card/Card";
 export default function HottestProducts(props) {
   let delay = 0;
   const HotProducts = props.ProductList.map((product) => {

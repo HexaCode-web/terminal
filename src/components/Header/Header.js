@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { GETDOC } from "../server";
+import { GETDOC } from "../../server";
 import "./Header.css";
 export default function Header(props) {
   let delay = 0;

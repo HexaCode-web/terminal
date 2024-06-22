@@ -1,10 +1,8 @@
 /* eslint-disable array-callback-return */
 import React, { useEffect } from "react";
-import Card from "./Card";
-import { useParams } from "react-router-dom";
+import Card from "./Card/Card";
 
 export default function ProductList(props) {
-  console.log(props);
   let filteredData = props.List;
   return (
     <>

@@ -1,0 +1,27 @@
+.Users,
+.Products,
+.Categories,
+.Pending {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.Users table,
+.Products table {
+  max-width: 900px;
+  margin: auto;
+  overflow-x: auto;
+}
+
+.Users button {
+  border-radius: 5px;
+  color: white;
+  border: 1px solid #9b1e2b;
+}
+.Users .Danger {
+  border: 1px solid #9b1e2b;
+}
+.Users .Danger:hover {
+  background-color: #d9534f;
+  border-radius: 5px;
+}

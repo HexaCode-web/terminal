@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { GETDOC, SETDOC } from "../../server";
 import loadingTransparent from "../../assets/loading-13.gif";
 import { CreateToast } from "../../App";
-import MyModal from "../Modal/Modal";
+import MyModal from "../Modal";
 import DataTable from "react-data-table-component";
 import date from "date-and-time";
 import "./DashOrders.css";

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import loadingLight from "../../assets//loading-13.gif";
 import sortBy from "sort-by";
-import MyModal from "../Modal/Modal";
+import MyModal from "../Modal";
 import {
   GETDOC,
   SETDOC,
@@ -20,7 +20,7 @@ export default function DashCate(props) {
   const [newCate, setNewCate] = React.useState({
     Name: "",
     URL: "",
-    Color: "rgba(0, 0, 0, 1)",
+    Color: "",
   });
   const [status, setStatus] = React.useState(false);
   const [urlDone, setUrlDone] = React.useState("false");
@@ -90,19 +90,13 @@ export default function DashCate(props) {
       alert("name already exists");
       return;
     } else {
-      console.log(id);
-      await SETDOC(
-        "categories",
+      await SETDOC("categories", id, {
         id,
-        {
-          id: id ? id : 1,
-          Name: newCate.Name,
-          products: [],
-          icon: newCate.URL,
-          color: newCate.Color,
-        },
-        true
-      );
+        Name: newCate.Name,
+        products: [],
+        icon: newCate.URL,
+        color: newCate.Color,
+      });
       setCatagories(await GETCOLLECTION("categories"));
       const productList = await GETCOLLECTION("products");
       const catagories = await GETCOLLECTION("categories");
@@ -227,7 +221,7 @@ export default function DashCate(props) {
       ),
     };
   });
-  console.log(newCate);
+
   return (
     <>
       <h1 className="animate__animated animate__backInDown">Categories</h1>

@@ -2,8 +2,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper";
 import "swiper/css/pagination";
-import Card from "../components/Card";
-import "../components/Banner.css";
+import Card from "../components/Card/Card";
+import "../components/Banner/Banner.css";
 import { v4 as uid } from "uuid";
 
 const SliderList = (props) => {

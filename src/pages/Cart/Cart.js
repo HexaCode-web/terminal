@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import date from "date-and-time";
 import secureLocalStorage from "react-secure-storage";
-import { GETDOC, SETDOC } from "../server";
+import { GETDOC, SETDOC } from "../../server";
 import { v4 as uuid } from "uuid";
-import loadingTransparent from "../assets/loading-13.gif";
-import removeBtn from "../assets/001-minus.png";
-import addBtn from "../assets/002-plus.png";
-import Empty from "../assets/empty-cart.png";
+import loadingTransparent from "../../assets/loading-13.gif";
+import removeBtn from "../../assets/001-minus.png";
+import addBtn from "../../assets/002-plus.png";
+import Empty from "../../assets/empty-cart.png";
 import "./Cart.css";
-import { CreateToast } from "../App";
+import { CreateToast } from "../../App";
 export default function Cart(props) {
   const [activeUser, setActiveUser] = React.useState({});
   const [LocalCart, setLocalCart] = React.useState([]);

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import MyModal from "../Modal/Modal";
+import MyModal from "../Modal";
 import { CreateToast } from "../../App";
 import { GETCOLLECTION, SETDOC, GETDOC, DELETEUSER } from "../../server";
 import secureLocalStorage from "react-secure-storage";

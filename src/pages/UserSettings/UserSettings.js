@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import MyModal from "../components/Modal";
+import MyModal from "../../components/Modal/Modal";
 import secureLocalStorage from "react-secure-storage";
 import "react-toastify/dist/ReactToastify.css";
-import { CreateToast } from "../App";
+import { CreateToast } from "../../App";
 import _ from "lodash";
 
 import {
@@ -13,7 +13,7 @@ import {
   SETDOC,
   LOGIN,
   RESETPASSWORD,
-} from "../server";
+} from "../../server";
 export default function Settings(props) {
   const [activePage, setActivePage] = React.useState("Login");
   const [showModal, setShowModal] = React.useState(false);

@@ -1,6 +1,6 @@
 import React from "react";
 import DataTable from "react-data-table-component";
-import MyModal from "../Modal/Modal";
+import MyModal from "../Modal";
 const DashHistory = (props) => {
   const [RejectReason, setRejectReason] = React.useState(null);
   const [showModal, setShowModal] = React.useState(false);

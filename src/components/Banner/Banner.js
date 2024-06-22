@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper";
 import "swiper/css/pagination";
-import Card from "./Card";
+import Card from "../Card/Card";
 import "./Banner.css";
 import { v4 as uid } from "uuid";
 

@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import HottestProducts from "../Sections/HottestProducts";
-import LatestOffers from "../Sections/LatestOffers";
-import RecentProducts from "../Sections/RecentProducts";
-import { default as Banner1 } from "./Banner";
-import { default as Banner2 } from "./Banner";
-import { default as ExtraOne } from "../Sections/SliderList";
-import { default as ExtraTwo } from "../Sections/SliderList";
-import { default as ExtraThree } from "../Sections/SliderList";
-import { default as ExtraFour } from "../Sections/SliderList";
+import HottestProducts from "../../Sections/HottestProducts";
+import LatestOffers from "../../Sections/LatestOffers";
+import RecentProducts from "../../Sections/RecentProducts";
+import { default as Banner1 } from "../Banner/Banner";
+import { default as Banner2 } from "../Banner/Banner";
+import { default as ExtraOne } from "../../Sections/SliderList";
+import { default as ExtraTwo } from "../../Sections/SliderList";
+import { default as ExtraThree } from "../../Sections/SliderList";
+import { default as ExtraFour } from "../../Sections/SliderList";
 
-import ReviewProducts from "../Sections/ReviewProducts";
+import ReviewProducts from "../../Sections/ReviewProducts";
 import "./Content.css";
-import { GETCOLLECTION, GETDOC } from "../server";
+import { GETCOLLECTION, GETDOC } from "../../server";
 
 export default function Content() {
   const [Products, setProducts] = React.useState([]);

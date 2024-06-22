@@ -9,7 +9,7 @@ import {
   getDownloadURL,
   uploadBytes,
 } from "firebase/storage";
-import Error404 from "../../pages/Error404/Error404.js";
+import Error404 from "../../pages/Error404";
 import "react-toastify/dist/ReactToastify.css";
 import AddPhoto from "../../assets/addphoto.png";
 import secureLocalStorage from "react-secure-storage";
@@ -136,20 +136,19 @@ export default function EditProduct() {
     let firstProduct;
     let SecondProduct;
     await GETDOC("websiteData", "mainProduct1").then(
-      (res) => (firstProduct = res.mainProduct1)
+      (res) => (firstProduct = res)
     );
 
     await GETDOC("websiteData", "mainProduct2").then(
-      (res) => (SecondProduct = res.mainProduct2)
+      (res) => (SecondProduct = res)
     );
 
     if (firstProduct.id == id) {
-      console.log(firstProduct);
-      await SETDOC("websiteData", "mainProduct1", { mainProduct1: Product });
+      console.log("true");
+      await SETDOC("websiteData", "mainProduct1", { ...Product });
     }
     if (SecondProduct.id == id) {
-      console.log(SecondProduct);
-      await SETDOC("websiteData", "mainProduct2", { mainProduct2: Product });
+      await SETDOC("websiteData", "mainProduct2", { ...Product });
     }
     await SETDOC("products", id, { ...Product });
     const productList = await GETCOLLECTION("products");

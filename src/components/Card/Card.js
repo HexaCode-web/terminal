@@ -1,5 +1,5 @@
-import Star from "../assets/star-empty.png";
-import starFilled from "../assets/star-filled.png";
+import Star from "../../assets/star-empty.png";
+import starFilled from "../../assets/star-filled.png";
 import "./Card.css";
 export default function Card(props) {
   const productData = props.product;

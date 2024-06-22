@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import "./Footer.css";
-import Facebook from "../assets/facebook.png";
-import Youtube from "../assets/youtube.png";
-import Twitter from "../assets/twitter.png";
-import Telegram from "../assets/telegram.png";
-import Pinterest from "../assets/pinterest.png";
-import Instagram from "../assets/instagram.png";
-import { CreateToast } from "../App";
-import { GETDOC } from "../server";
+import Facebook from "../../assets/facebook.png";
+import Youtube from "../../assets/youtube.png";
+import Twitter from "../../assets/twitter.png";
+import Telegram from "../../assets/telegram.png";
+import Pinterest from "../../assets/pinterest.png";
+import Instagram from "../../assets/instagram.png";
+import { CreateToast } from "../../App";
+import { GETDOC } from "../../server";
 const Footer = (props) => {
   const [FooterData, setFooterData] = React.useState({ logo: "" });
   useEffect(() => {
@@ -62,7 +62,7 @@ const Footer = (props) => {
         break;
     }
     return Social.Link ? (
-      <li>
+      <li data-aos="fade-up">
         <a href={Social.Link}>
           <img src={img} />
         </a>

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import DataTable from "react-data-table-component";
 import secureLocalStorage from "react-secure-storage";
-import { GETCOLLECTION, GETDOC } from "../server";
-import MyModal from "../components/Modal";
+import { GETCOLLECTION, GETDOC } from "../../server";
+import MyModal from "../../components/Modal/Modal";
 
 export default function History() {
   const [history, setHistory] = React.useState(null);

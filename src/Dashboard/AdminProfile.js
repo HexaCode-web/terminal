@@ -10,7 +10,7 @@ import {
 } from "../../server";
 import secureLocalStorage from "react-secure-storage";
 
-import MyModal from "../Modal/Modal";
+import MyModal from "../Modal";
 import { CreateToast } from "../../App";
 const AdminProfile = (props) => {
   const [activePage, setActivePage] = React.useState("Login");
@@ -34,7 +34,7 @@ const AdminProfile = (props) => {
     });
     if (Match) {
       userToSend = { ...ActiveUser, email: OldEmail };
-      CreateToast("email wasn't updated due to it was taken", "error");
+      CreateToast("email wasn't updated due to it was  taken", "error");
     } else {
       userToSend = ActiveUser;
       try {
@@ -44,7 +44,7 @@ const AdminProfile = (props) => {
         CreateToast(error.message, "error");
       }
     }
-    props.UpdateUser(userToSend, false);
+    props.UpdateUser(userToSend, false, "", false);
     OldEmail = JSON.parse(secureLocalStorage.getItem("activeUser")).email;
   };
   const handlePrimaryAction = async (e) => {
@@ -255,10 +255,10 @@ const AdminProfile = (props) => {
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
-                  props.UpdateUser(ActiveUser, true);
+                  props.UpdateUser(ActiveUser, false, "", true);
                 }}
                 value="Save"
-                style={{ margin: "auto", width: "50%", textIndent: "0" }}
+                style={{ margin: "auto", width: "50%" }}
               />
             </form>
           </div>

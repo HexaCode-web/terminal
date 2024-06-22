@@ -1,23 +1,28 @@
 /* DATABASE end*/
 import React, { useEffect } from "react";
-import deleteIcon from "../assets/delete.png";
+import deleteIcon from "../../assets/delete.png";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
-import Users from "../components/Dashboard/DashUsers";
-import Products from "../components/Dashboard/DashProducts";
+import Users from "../../components/Dashboard/DashUsers";
+import Products from "../../components/Dashboard/DashProducts";
 import "react-toastify/dist/ReactToastify.css";
 import "./Dashboard.css";
 import secureLocalStorage from "react-secure-storage";
-import DashCate from "../components/Dashboard/DashCate";
+import DashCate from "../../components/Dashboard/DashCate";
 import date from "date-and-time";
-import { CreateToast } from "../App";
-import { GETCOLLECTION, GETDOC, SETDOC, productDistributor } from "../server";
-import PendingOrders from "../components/Dashboard/DashOrders";
-import DashHistory from "../components/Dashboard/DashHistory";
-import AdminProfile from "../components/Dashboard/AdminProfile";
-import WebSettings from "../components/Dashboard/WebSettings";
+import { CreateToast } from "../../App";
+import {
+  GETCOLLECTION,
+  GETDOC,
+  SETDOC,
+  productDistributor,
+} from "../../server";
+import PendingOrders from "../../components/Dashboard/DashOrders";
+import DashHistory from "../../components/Dashboard/DashHistory";
+import AdminProfile from "../../components/Dashboard/AdminProfile";
+import WebSettings from "../../components/Dashboard/WebSettings";
 ChartJS.register(ArcElement, Tooltip, Legend);
-import Widget from "../components/Dashboard/Widget";
+import Widget from "../../components/Dashboard/Widget";
 export default function DashBoard(props) {
   const [ActiveUser, setActiveUser] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser"))
@@ -45,7 +50,7 @@ export default function DashBoard(props) {
   const [activePage, setActivePage] = React.useState("Overview");
   const [chartData, setChartData] = React.useState(null);
   const [Notes, setNotes] = React.useState([]);
-
+  console.log(chartData);
   /*GETTING NUMBERS*/
   const fetchNumbers = async () => {
     let catagoriesLocal = {};
@@ -252,7 +257,7 @@ export default function DashBoard(props) {
                 `your Profile is incomplete! go to ${
                   res.admin ? "Admin Profile" : "settings"
                 } to complete it`,
-                "warn"
+                "warning"
               );
               return;
             }

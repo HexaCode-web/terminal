@@ -1,0 +1,70 @@
+.Categories label {
+  color: black;
+}
+
+.Categories .Modal {
+  width: fit-content;
+  margin: auto;
+  color: white !important;
+}
+.Categories input[type="text"] {
+  border: 1px solid black;
+}
+.Categories .table img {
+  max-width: 200px;
+}
+
+.Cate .EditCate {
+  width: 60%;
+  margin: auto;
+  height: fit-content;
+  border: 1px solid white;
+  border-radius: 20px;
+  margin-bottom: 40px;
+}
+.Cate .EditCate form .formItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Cate h3 {
+  margin-top: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.Cate .EditCate form .formItem input {
+  min-height: 40px;
+}
+.Cate .EditCate form .formItem:nth-of-type(1) {
+  grid-area: name;
+}
+.Cate .EditCate form .formItem:nth-of-type(2) {
+  grid-area: color;
+}
+.Cate .EditCate form .formItem:nth-of-type(3) {
+  grid-area: image;
+}
+.Cate .EditCate form .formItem:nth-of-type(4) {
+  grid-area: button;
+  margin-top: 0;
+  width: 100%;
+  display: flex;
+}
+.Cate .EditCate form .formItem:nth-of-type(4) input {
+  width: fit-content;
+  margin: auto;
+}
+.Cate .EditCate form {
+  padding: 0;
+  gap: 30px;
+  border: none;
+  display: grid;
+  grid-template-areas: "name color" "image image" "button button";
+}
+.Categories {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}

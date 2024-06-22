@@ -1,0 +1,91 @@
+.Products {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.newProduct {
+  display: flex;
+  flex-direction: column;
+}
+.AddProduct label {
+  min-width: fit-content;
+  padding-left: 10px;
+  font-size: 0.9rem;
+  font-weight: bolder;
+  color: black;
+}
+.AddProduct button {
+  height: 30px;
+  min-width: fit-content;
+}
+.AddProduct input,
+.AddProduct textarea,
+.AddProduct select {
+  margin: 0 auto;
+  width: 95%;
+  border: 1.5px solid #ed1a4e;
+  background-color: transparent;
+}
+.AddProduct input[type="file"] {
+  border: none;
+  margin: 0;
+}
+.AddProduct input[type="submit"] {
+  background-color: transparent;
+  width: 25%;
+}
+.AddProduct {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.select-wrapper {
+  margin-top: 13px;
+  width: 95%;
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  border: 1.5px solid #ed1a4e;
+}
+.photo {
+  display: flex;
+  width: 95%;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-check {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+.Add {
+  background-color: transparent !important;
+  border: 1.5px solid #ed1a4e !important;
+}
+.alert {
+  text-align: center;
+  color: black !important;
+}
+.Products table {
+  max-width: 900px;
+  margin: auto;
+  overflow-x: auto;
+}
+
+.Products .Add {
+  margin: auto;
+  width: 20%;
+}
+.Products button:hover {
+  background-color: #0275d8;
+  scale: 1.05;
+}
+.Products button {
+  border: none;
+  color: white;
+  border-radius: 5px;
+}
+.LowStock {
+  color: red !important;
+}

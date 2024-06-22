@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import Profile from "./Profile";
+import Profile from "../Profile/Profile";
 import "react-toastify/dist/ReactToastify.css";
 import secureLocalStorage from "react-secure-storage";
-import { CreateToast } from "../App";
+import { CreateToast } from "../../App";
 import {
   GETDOC,
   NEWUSER,
@@ -11,10 +11,10 @@ import {
   DELETECURRENTUSER,
   DELETEDOC,
   RESETPASSWORD,
-} from "../server";
-import loadingDark from "../assets/loadingDark.gif";
+} from "../../server";
+import loadingDark from "../../assets/loadingDark.gif";
 import "./User.css";
-import MyModal from "../components/Modal";
+import MyModal from "../../components/Modal/Modal";
 export default function User() {
   const [user] = React.useState(
     JSON.parse(secureLocalStorage.getItem("activeUser")) || ""
