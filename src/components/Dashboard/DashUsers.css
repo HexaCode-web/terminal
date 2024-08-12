@@ -15,11 +15,14 @@
 
 .Users button {
   border-radius: 5px;
+  color: black;
+  border: 1px solid var(--borders);
+}
+.Dark .Users button {
   color: white;
-  border: 1px solid #9b1e2b;
 }
 .Users .Danger {
-  border: 1px solid #9b1e2b;
+  border: 1px solid var(--borders);
 }
 .Users .Danger:hover {
   background-color: #d9534f;

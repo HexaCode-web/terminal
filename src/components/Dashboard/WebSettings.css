@@ -8,7 +8,7 @@ section {
   padding: 15px;
   border-radius: 15px;
   width: 90%;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
 }
 .Container {
   justify-content: unset;
@@ -65,9 +65,9 @@ input:focus {
   gap: 20px;
 }
 .HeaderEdit .formItem textarea {
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 10px;
-  color: white;
+  color: black;
   resize: none;
 }
 .HeaderEdit .formItem textarea:focus {
@@ -93,7 +93,7 @@ input:focus {
 select {
   padding: 8px;
   font-size: 16px;
-  border: 1px solid #555;
+  border: 1px solid var(--borders);
   border-radius: 4px;
   background-color: #333;
   color: #fff;
@@ -125,7 +125,7 @@ select::after {
 }
 .Banners .Part {
   width: 100%;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   padding: 15px;
   margin: 20px 0;
@@ -139,16 +139,20 @@ select::after {
 }
 .css-1p3m7a8-multiValue {
   background-color: hsl(0, 0%, 20%) !important;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 15px !important;
 }
 .css-wsp0cs-MultiValueGeneric {
-  color: white !important;
+  color: black !important;
 }
 .css-12a83d4-MultiValueRemove:hover {
   background-color: transparent !important;
 }
 .css-qbdosj-Input {
+  color: black !important;
+}
+.Dark .css-qbdosj-Input,
+.Dark .css-wsp0cs-MultiValueGeneric {
   color: white !important;
 }
 .Review {

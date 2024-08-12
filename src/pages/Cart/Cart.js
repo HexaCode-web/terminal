@@ -5,7 +5,9 @@ import { GETDOC, SETDOC } from "../../server";
 import { v4 as uuid } from "uuid";
 import loadingTransparent from "../../assets/loading-13.gif";
 import removeBtn from "../../assets/001-minus.png";
+import removeBtnDark from "../../assets/001-minus dark.png";
 import addBtn from "../../assets/002-plus.png";
+import addBtnDark from "../../assets/002-plus dark.png";
 import Empty from "../../assets/empty-cart.png";
 import "./Cart.css";
 import { CreateToast } from "../../App";
@@ -22,7 +24,6 @@ export default function Cart(props) {
     const id = randomNumber.toString().padStart(8, "0");
     return id;
   }
-
   const AddToPending = async () => {
     if (LocalCart.length === 0) {
       CreateToast("Please add some items to the cart first", "error");
@@ -211,14 +212,26 @@ export default function Cart(props) {
                         increase(productWrapper.product.id);
                       }}
                     >
-                      <img src={addBtn}></img>
+                      <img
+                        src={
+                          JSON.parse(localStorage.getItem("darkMode"))
+                            ? addBtnDark
+                            : addBtn
+                        }
+                      ></img>
                     </button>
                     <button
                       onClick={() => {
                         decrease(productWrapper.product.id);
                       }}
                     >
-                      <img src={removeBtn}></img>
+                      <img
+                        src={
+                          JSON.parse(localStorage.getItem("darkMode"))
+                            ? removeBtnDark
+                            : removeBtn
+                        }
+                      ></img>
                     </button>
                   </div>
                   <p>{productWrapper.quantity}</p>

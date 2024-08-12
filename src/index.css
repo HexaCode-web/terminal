@@ -28,8 +28,12 @@ SCROLL BAR
 GENERAL
 ===========
 */
+:root {
+  --borders: #ee233a;
+}
 .reviewWrapper {
   gap: 30px;
+  width: 100%;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -42,6 +46,7 @@ GENERAL
 }
 /*ORDER STATUS STYLES*/
 .status {
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -69,17 +74,24 @@ GENERAL
   width: 150px;
 }
 .LoadingMain {
+  background-color: #f1f1f1;
+}
+.Dark .LoadingMain {
   background-color: #212529;
 }
 .App {
   font-family: "Montserrat", sans-serif;
   overflow-x: hidden;
   width: 100%;
-  height: 100vh;
   min-height: 100%;
   display: flex;
-  background-color: #212529;
+  background-color: #f1f1f1;
+  color: black;
+  transition: 0.5s all;
   flex-direction: column;
+}
+.Dark {
+  background-color: #212529;
   color: white;
 }
 form input,
@@ -117,33 +129,40 @@ textarea:focus {
   --_i: 100%;
   transition: 0.3s, background-size 0.3s 0.3s;
 }
-h1 {
+.Dark h1 {
   background: -webkit-linear-gradient(90deg, #fdc830, #ed1a4e);
   background-clip: inherit;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+h1 {
+  color: black;
+
   text-align: center;
   font-weight: 400;
 }
 .OldPrice {
   opacity: 0.5 !important;
-  margin-right: 20px;
+  margin-left: 20px;
   text-decoration: line-through;
 }
 .button:hover {
   background-color: #0275d8;
   scale: 1.05;
 }
-
+.Dark .button {
+  border: 1px solid var(--borders) !important;
+  color: white !important;
+}
 .button {
   margin: 10px;
   border-radius: 5px !important;
-  color: white !important;
-  border: 1px solid #9b1e2b !important;
+  color: black !important;
+  border: 1px solid black !important;
 }
 button {
-  border: 1px solid green;
-  color: white;
+  border: 1px solid black;
+  color: black;
   border-radius: 5px;
 }
 .Danger {
@@ -158,11 +177,8 @@ button {
 PRODUCT PREVIEW
 ===========
 */
-.carousel-item img {
-  max-width: 600px;
-  max-height: 400px;
-  min-width: 400px;
-  min-height: 400px;
+.productReview .Swiper-Wrapper .swiper-slide img {
+  height: 100%;
   border-radius: 15px;
   margin: 0 auto;
 }
@@ -171,14 +187,24 @@ PRODUCT PREVIEW
   margin: 10px auto;
   text-align: center;
 }
-
+.productReview .Swiper-Wrapper {
+  width: 100%;
+  height: 600px;
+}
+.productReview .Swiper-Wrapper .swiper-slide {
+  justify-content: center;
+  display: flex;
+  height: 300px;
+}
 .productReview {
   margin: 0 15px;
-  width: 45%;
+  width: 30%;
   display: flex;
-  max-height: 600px;
-  min-height: 600px;
+  height: 600px;
   flex-direction: column;
+  padding: 15px;
+  border: 1px solid black;
+  border-radius: 15px;
   justify-content: center;
   align-items: center;
 }
@@ -244,10 +270,15 @@ PRODUCT PREVIEW
   align-items: center;
   flex-direction: row;
 }
-.Container input {
+.Dark .Container input {
   color: white;
-  border: none;
   border-bottom: 1px solid white;
+}
+.Container input {
+  color: black;
+
+  border: none;
+  border-bottom: 1px solid black;
   margin-bottom: 15px;
   border-radius: 7px;
 }

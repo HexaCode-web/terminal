@@ -172,7 +172,7 @@ export default function Users() {
       <DataTable
         className="animate__animated animate__fadeIn"
         style={{ animationDelay: ".4s" }}
-        theme="dark"
+        theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
         pagination
         highlightOnHover
         columns={columns}

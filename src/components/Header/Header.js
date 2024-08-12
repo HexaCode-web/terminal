@@ -49,6 +49,7 @@ export default function Header(props) {
       >
         <a href={`/category/${category.Name}`}>
           <img src={category.icon}></img>
+          <p className="Name">{category.Name}</p>
         </a>
       </li>
     );
@@ -58,7 +59,10 @@ export default function Header(props) {
       <img className="bg-img" src={WebsiteData.background} />
 
       <div className="HeaderContent ">
-        <h1 className="animate__animated animate__fadeInDown">
+        <h1
+          className="animate__animated animate__fadeInDown"
+          style={{ color: "white" }}
+        >
           {WebsiteData.headline}
         </h1>
         <h4 className="animate__animated animate__fadeInUp">

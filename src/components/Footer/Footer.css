@@ -3,8 +3,10 @@
   display: flex;
   flex-direction: column;
   padding: 15px;
+  color: white !important;
   margin-top: 100px;
 }
+
 .FooterWrapper p {
   text-align: unset;
 }
@@ -14,7 +16,7 @@
   transition: 0.2s all;
 }
 .FooterWrapper a:hover {
-  color: white;
+  color: black;
 }
 .FooterWrapper ul {
   list-style: none;

@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import secureLocalStorage from "react-secure-storage";
-import { GETDOC } from "../../server";
-import MyModal from "../../components/Modal/Modal";
+import { GETDOC, QUERY } from "../../server";
 
 export default function History() {
-  const [pending, setPending] = React.useState(null);
+  const [pending, setPending] = useState(null);
+  const [data, setData] = useState([]);
+
   const columns = [
     {
       name: "Order",
@@ -19,36 +20,52 @@ export default function History() {
     },
   ];
 
-  const data = pending?.map((order) => {
-    console.log(order);
-    return {
-      id: order.ID,
-      Date: order.CreatedAt,
-      Order: (
-        <span
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            window.location.href = `/product/${order.Order.id}`;
-          }}
-        >
-          {order.Order.title}
-        </span>
-      ),
-    };
-  });
+  const fetchData = async () => {
+    if (pending) {
+      const data = await Promise.all(
+        pending.map(async (order) => {
+          const Product = await QUERY("products", "id", "==", order.product);
+          console.log(Product[0]);
+          return {
+            id: order.ID,
+            Date: order.CreatedAt,
+            Order: (
+              <span
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  window.location.href = `/product/${order.product}`;
+                }}
+              >
+                {Product[0].title}
+              </span>
+            ),
+          };
+        })
+      );
+      setData(data);
+    }
+  };
 
   useEffect(() => {
     const FetchUser = async () => {
       let id = JSON.parse(secureLocalStorage.getItem("activeUser")).id;
-      await GETDOC("users", id).then((res) => {
-        setPending(res.pending);
-      });
+      const userDoc = await GETDOC("users", id);
+      setPending(userDoc.pending);
     };
     FetchUser();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [pending]);
+
   return (
     <div className="Container tableWrapper">
-      <DataTable theme="dark" columns={columns} data={data} />
+      <DataTable
+        theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
+        columns={columns}
+        data={data}
+      />
     </div>
   );
 }

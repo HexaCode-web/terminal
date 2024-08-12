@@ -7,18 +7,20 @@ import {
   ref,
   deleteObject,
   getDownloadURL,
-  uploadBytes,
 } from "firebase/storage";
 import Error404 from "../../pages/Error404/Error404.js";
 import "react-toastify/dist/ReactToastify.css";
 import AddPhoto from "../../assets/addphoto.png";
+import AddPhotoDark from "../../assets/addphoto dark.png";
 import secureLocalStorage from "react-secure-storage";
 import { CreateToast } from "../../App";
 import {
   DELETEDOC,
+  DELETEPHOTO,
   GETCOLLECTION,
   GETDOC,
   SETDOC,
+  UPLOADPHOTO,
   productDistributor,
 } from "../../server";
 import loading from "../../assets/loading-13.gif";
@@ -163,23 +165,17 @@ export default function EditProduct() {
       if (imageObject.url === url) return imageObject;
     });
     if (targetImg) {
-      Product.images.forEach((image, index) => {
-        if (targetImg.index === image.index) {
-          Product.images.splice(index, 1);
-          const desertRef = ref(storage, `images/${id}/${targetImg.index}`);
-          deleteObject(desertRef)
-            .then(() => {
-              SETDOC("products", id, { ...Product });
-              GETDOC("products", id).then((value) => {
-                setProduct(value);
-              });
-              CreateToast("photo has been deleted", "success");
-            })
-            .catch((error) => {
-              CreateToast(error, "error");
-            });
-        }
+      DELETEPHOTO(targetImg.url);
+      const newImages = Product.images.filter((imageObject) => {
+        return imageObject.index != targetImg.index;
       });
+      setProduct((prev) => {
+        return {
+          ...prev,
+          images: newImages,
+        };
+      });
+      CreateToast("photo has been deleted", "success");
     }
   };
   const MakeThumb = async (ActiveIMG) => {
@@ -187,22 +183,19 @@ export default function EditProduct() {
     CreateToast("changed thumbnail", "success");
   };
   const uploadPhoto = async (event) => {
-    const imageRef = ref(
-      storage,
-      `images/${Product.id}/${Product.images.length}`
-    );
     CreateToast("photo uploading", "warning");
-    uploadBytes(imageRef, event.target.files[0]).then(async (snapshot) => {
-      console.log("uploaded");
-      await getDownloadURL(snapshot.ref).then((url) => {
-        Product.images.push({ index: Product.images.length, url: url });
-        SETDOC("products", id, { ...Product });
-        GETDOC("products", id).then((value) => {
-          setProduct(value);
-        });
-        CreateToast("photo uploaded", "success");
-      });
+
+    const url = await UPLOADPHOTO(
+      `images/${Product.id}/${Product.images.length}`,
+      event.target.files[0]
+    );
+    setProduct((prev) => {
+      return {
+        ...prev,
+        images: [...prev.images, { index: prev.images.length, url }],
+      };
     });
+    CreateToast("photo uploaded", "success");
   };
   const Options = categories.map((category) => {
     return <option value={category.Name}>{category.Name}</option>;
@@ -252,7 +245,13 @@ export default function EditProduct() {
             <div className="ThumbPhotos">
               {photosEL}
               <label htmlFor="AddPhotoBTN" className="addPhoto">
-                <img src={AddPhoto}></img>
+                <img
+                  src={
+                    JSON.parse(localStorage.getItem("darkMode"))
+                      ? AddPhotoDark
+                      : AddPhoto
+                  }
+                ></img>
               </label>
               <input
                 type="file"
@@ -294,7 +293,7 @@ export default function EditProduct() {
                 value={Product.category}
                 required
                 onChange={handleInput}
-                style={{ color: "white", backgroundColor: "black" }}
+                style={{ color: "black", backgroundColor: "white" }}
               >
                 <option value="">--Please select a category--</option>
                 {Options}

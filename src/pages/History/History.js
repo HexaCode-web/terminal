@@ -106,7 +106,11 @@ export default function History() {
         </div>
       </MyModal>
       <div className="tableWrapper" style={{ width: "fitContent" }}>
-        <DataTable theme="dark" columns={columns} data={data} />
+        <DataTable
+          theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
+          columns={columns}
+          data={data}
+        />
       </div>
     </div>
   );

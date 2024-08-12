@@ -110,7 +110,11 @@ const DashHistory = (props) => {
     <>
       <h1>Orders History</h1>
       <div className="Container">
-        <DataTable theme="dark" columns={columns} data={data} />
+        <DataTable
+          theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
+          columns={columns}
+          data={data}
+        />
       </div>
       <MyModal
         show={showModal}

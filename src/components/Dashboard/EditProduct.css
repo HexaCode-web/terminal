@@ -12,11 +12,11 @@
 .EditProduct input[type="number"],
 .EditProduct input[type="checkbox"],
 .EditProduct textarea {
-  color: white;
+  color: black;
   width: 100%;
   padding: 10px;
-  background-color: black;
-  border: 1px solid #ccc;
+  background-color: white;
+  border: 1px solid var(--borders);
   border-radius: 5px;
   margin-bottom: 15px;
   font-size: 16px;
@@ -29,7 +29,7 @@
 .EditProduct select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--borders);
   border-radius: 5px;
   margin-bottom: 15px;
   font-size: 16px;
@@ -45,6 +45,9 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+}
+.Dark .EditProduct input[type="submit"] {
+  color: white;
 }
 .EditProduct .Images {
   display: flex;
@@ -64,7 +67,7 @@
 .EditProduct .ProductInfo {
   padding: 15px;
   margin: 20px auto;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   gap: 10px;
   grid-template-areas:
     "Title Brand"
@@ -178,7 +181,7 @@
 .EditProduct .Section2 .OtherInfo {
   padding: 20px 0;
   margin: 30px 0;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   display: grid;
   grid-template-columns: 50% 50%;
@@ -186,7 +189,7 @@
   place-items: center;
 }
 .EditProduct .addPhoto {
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   display: flex;
   justify-content: center;

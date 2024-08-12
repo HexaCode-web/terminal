@@ -1,6 +1,6 @@
 .ExtraList {
   display: grid;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   margin-bottom: 20px;
   grid-template-areas:

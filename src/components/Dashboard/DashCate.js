@@ -227,7 +227,6 @@ export default function DashCate(props) {
       ),
     };
   });
-  console.log(newCate);
   return (
     <>
       <h1 className="animate__animated animate__backInDown">Categories</h1>
@@ -317,7 +316,7 @@ export default function DashCate(props) {
           <DataTable
             pagination
             highlightOnHover
-            theme="dark"
+            theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
             columns={columns}
             data={data}
           />

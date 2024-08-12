@@ -83,8 +83,11 @@
 }
 .Products button {
   border: none;
-  color: white;
+  color: black;
   border-radius: 5px;
+}
+.Dark .Products button {
+  color: white;
 }
 .LowStock {
   color: red !important;

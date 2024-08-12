@@ -1,10 +1,9 @@
 /* eslint-disable array-callback-return */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../Card/Card";
 import { useParams } from "react-router-dom";
 import "./ProductList.css";
 export default function ProductList(props) {
-  console.log(props);
   const id = useParams().ID;
   const Target = props.List.find((category) => {
     if (category.Name == id) {
@@ -12,6 +11,7 @@ export default function ProductList(props) {
     }
   });
   const [categoryData, setCategoryData] = React.useState(Target.products);
+  const [chosenBrand, setChosenBrand] = useState([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filteredData, setFilteredData] = React.useState([]);
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function ProductList(props) {
   }, [Target]);
   const brandList = [
     ...new Set(
-      categoryData.map((product) => {
+      Target.products.map((product) => {
         return product.brand;
       })
     ),
@@ -27,10 +27,10 @@ export default function ProductList(props) {
 
   const SortBrand = (brand) => {
     if (brand === "All") {
-      setCategoryData(Target.products);
+      setChosenBrand(Target.products);
       return;
     }
-    setCategoryData(
+    setChosenBrand(
       categoryData.filter((product) => {
         if (product.brand.toLowerCase() === brand.toLowerCase()) {
           return product;
@@ -110,6 +110,10 @@ export default function ProductList(props) {
           >
             {searchTerm
               ? filteredData.map((product) => {
+                  return <Card key={product.id} product={product} />;
+                })
+              : chosenBrand
+              ? chosenBrand.map((product) => {
                   return <Card key={product.id} product={product} />;
                 })
               : categoryData.map((product) => {

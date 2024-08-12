@@ -160,6 +160,13 @@ export default function ViewUser() {
       AcceptedOrders,
       PendingOrders,
       Net: Math.round(+fetchedStatistics.Net + fetchedProduct.price),
+      NetAfterProductCost: Math.round(
+        +fetchedStatistics.Net +
+          fetchedProduct.price -
+          fetchedProduct.cost -
+          discount
+      ),
+
       TotalDiscount: Math.round(fetchedStatistics.TotalDiscount + discount),
       Revenue:
         fetchedStatistics.Net +
@@ -523,7 +530,7 @@ export default function ViewUser() {
                 ) : (
                   <DataTable
                     className="animate__animated  animate__fadeIn"
-                    theme="dark"
+                    theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
                     columns={columnsForHistory}
                     data={DataForHistory}
                   />
@@ -539,7 +546,7 @@ export default function ViewUser() {
                 ) : (
                   <DataTable
                     className="animate__animated  animate__fadeIn"
-                    theme="dark"
+                    theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
                     columns={columnsForPending}
                     data={dataForPending}
                   />

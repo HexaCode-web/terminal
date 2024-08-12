@@ -68,7 +68,7 @@
   border-radius: 15px;
   margin: 10px;
   padding: 20px;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   display: flex;
 
   justify-content: center;
@@ -95,7 +95,7 @@
   width: 300px;
   height: 400px;
   border-radius: 15px;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   padding: 20px;
 }
 .Progress .SideNumbers {
@@ -109,12 +109,21 @@
   text-align: center;
   font-size: 0.8rem;
 }
-.Progress .SideNumbers span {
+.Progress .SideNumbers .Center,
+.Progress .SideNumbers .Right,
+.Progress .SideNumbers .Left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.Progress .SideNumbers p {
   text-align: center;
+  font-size: 1rem;
 }
 .Charts .Chart {
   border-radius: 15px;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   padding: 20px;
   min-width: 500px;
   max-width: 500px;
@@ -140,7 +149,7 @@
   width: 90%;
   border-radius: 15px;
   margin: 10px;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   grid-area: notes;
   display: flex;
   flex-direction: column;
@@ -150,7 +159,7 @@
   padding: 0 10px;
   width: 80%;
   background-color: transparent;
-  color: white;
+  color: black;
   border: none;
   border-bottom: 2px solid #ee233a;
   border-bottom-left-radius: 10px;
@@ -160,8 +169,8 @@
   outline: none;
 }
 .Notes button {
-  color: white;
-  border: 1px solid #ee233a;
+  color: black;
+  border: 1px solid var(--borders);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -193,10 +202,13 @@
   max-height: 20px;
 }
 .Notes button:hover {
-  color: white;
+  color: black;
   cursor: pointer;
   scale: 1.1;
   background-color: #ee233a;
+}
+.dark .notes button:hover: {
+  color: white;
 }
 .Notes .input-wrapper {
   gap: 20px;
@@ -214,7 +226,7 @@
   align-items: center;
   width: fit-content;
   min-width: 250px;
-  border: 1px solid #ee233a;
+  border: 1px solid var(--borders);
   transition: 0.2s all;
 }
 .Dashboard .Card:hover {

@@ -11,10 +11,11 @@ import Pending from "./pages/Pending/Pending";
 import Settings from "./pages/UserSettings/UserSettings";
 import ViewUser from "./components/Dashboard/ViewUser";
 import loadingDark from "./assets/loadingDark.gif";
+import loadingWhite from "./assets/loading-13.gif";
 import Footer from "./components/Footer/Footer";
 import EditProduct from "./components/Dashboard/EditProduct";
 import DashBoard from "./pages/Dashboard/Dashboard";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./index.css";
 import "animate.css";
 import { Routes, Route } from "react-router-dom";
@@ -22,6 +23,7 @@ import secureLocalStorage from "react-secure-storage";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GETCOLLECTION, GETDOC, SETDOC } from "./server";
+
 export const CreateToast = (text, type, duration = 5000) => {
   let value;
   switch (type) {
@@ -65,7 +67,11 @@ export default function App() {
   const [WebsiteData, setWebsiteData] = React.useState({
     title: "",
   });
-
+  const [darkMode, setDarkMode] = useState(false);
+  const toggleDarkMode = () => {
+    localStorage.setItem("darkMode", darkMode);
+    setDarkMode((prev) => !prev);
+  };
   async function GetData() {
     setLoading(true);
     await GETDOC("websiteData", "title").then((res) =>
@@ -127,7 +133,7 @@ export default function App() {
     }
   }, [UpdateCart]);
   return (
-    <div className="App">
+    <div className={`App ${darkMode && "Dark"}`}>
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -138,11 +144,11 @@ export default function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme={`${darkMode && "dark"}`}
       />
       {Loading ? (
         <div className="overlay LoadingMain">
-          <img src={loadingDark} />
+          <img src={darkMode ? loadingDark : loadingWhite} />
         </div>
       ) : (
         ""
@@ -151,6 +157,8 @@ export default function App() {
         handleSearch={handleSearch}
         activeUser={activeUser}
         UpdateCart={UpdateCart}
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
       />
 
       <Routes>
@@ -177,11 +185,7 @@ export default function App() {
             element={
               <>
                 <Header List={Data} catagories={catagories} />
-                {catagories.length !== 0 ? (
-                  <ProductList List={catagories} />
-                ) : (
-                  ""
-                )}
+                {catagories.length !== 0 && <ProductList List={catagories} />}
               </>
             }
           ></Route>

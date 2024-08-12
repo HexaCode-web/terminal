@@ -437,7 +437,7 @@ export default function ViewUser() {
                 ) : (
                   <DataTable
                     className="animate__animated  animate__fadeIn"
-                    theme="dark"
+                    theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
                     columns={columnsForHistory}
                     data={DataForHistory}
                   />
@@ -453,7 +453,7 @@ export default function ViewUser() {
                 ) : (
                   <DataTable
                     className="animate__animated  animate__fadeIn"
-                    theme="dark"
+                    theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
                     columns={columnsForPending}
                     data={dataForPending}
                   />

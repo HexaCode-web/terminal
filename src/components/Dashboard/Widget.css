@@ -1,18 +1,21 @@
 .Widget {
   flex: 1;
-  display: flex;
-  border: 1px solid #9b1e2b;
+  border: 1px solid var(--borders);
   padding: 15px;
   border-radius: 15px;
-  width: 270px;
   height: 200px;
-}
-.Widget .Left {
-  flex: 1.2;
+  position: relative;
+  text-align: left;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 10px;
+  width: 97%;
+  margin: 40px auto;
+  margin-top: 20px;
 }
+
 .Widget .Left .Title {
   font-size: 1rem;
   opacity: 0.9;
@@ -33,7 +36,7 @@
   padding: 5px 10px;
   scale: 1.05;
   cursor: pointer;
-  border: 1px solid #b93341;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   border-top: none;
 }
@@ -63,4 +66,20 @@
 }
 .red {
   color: red !important;
+}
+
+.Widget .Left {
+  flex: 1.2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.Widget .Left .Title {
+  user-select: none;
+  color: black;
+  background-color: #f3f3f3;
+  position: absolute;
+  top: -13px;
+  left: 18px;
 }

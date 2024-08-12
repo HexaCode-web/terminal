@@ -120,6 +120,13 @@ export default function PendingOrders(props) {
       AcceptedOrders,
       PendingOrders,
       Net: Math.round(+fetchedStatistics.Net + fetchedProduct.price),
+      NetAfterProductCost: Math.round(
+        +fetchedStatistics.Net +
+          fetchedProduct.price -
+          fetchedProduct.cost -
+          discount
+      ),
+
       TotalDiscount: Math.round(fetchedStatistics.TotalDiscount + discount),
       Revenue:
         fetchedStatistics.Net +
@@ -270,7 +277,11 @@ export default function PendingOrders(props) {
       )}
       <h1> Pending Orders</h1>
       <div className="tableWrapper">
-        <DataTable theme="dark" columns={columns} data={data} />
+        <DataTable
+          theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
+          columns={columns}
+          data={data}
+        />
       </div>
     </div>
   );

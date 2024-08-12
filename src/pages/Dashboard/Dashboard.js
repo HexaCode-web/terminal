@@ -1,6 +1,7 @@
 /* DATABASE end*/
 import React, { useEffect } from "react";
 import deleteIcon from "../../assets/delete.png";
+import deleteIconDark from "../../assets/delete dark.png";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import Users from "../../components/Dashboard/DashUsers";
@@ -40,6 +41,7 @@ export default function DashBoard(props) {
     Products: 0,
     RejectedOrders: 0,
     Revenue: 0,
+    NetAfterProductCost: 0,
     TotalDiscount: 0,
     UserCount: 0,
     notes: 0,
@@ -50,7 +52,6 @@ export default function DashBoard(props) {
   const [activePage, setActivePage] = React.useState("Overview");
   const [chartData, setChartData] = React.useState(null);
   const [Notes, setNotes] = React.useState([]);
-  console.log(chartData);
   /*GETTING NUMBERS*/
   const fetchNumbers = async () => {
     let catagoriesLocal = {};
@@ -287,6 +288,7 @@ export default function DashBoard(props) {
       window.removeEventListener("focus", handleWindowFocus);
     };
   }, []);
+
   return (
     <div className="Dashboard">
       {props.UserUpdated && CreateToast("Updated your info!", "success")}
@@ -476,31 +478,23 @@ export default function DashBoard(props) {
                 }}
                 setActivePage={setActivePage}
               />
-              <Widget
-                delay=".3s"
-                data={{
-                  Title: "Total Earnings:",
-                  Info: statistics.Revenue,
-                  Link: "",
-                  percent: compareValues.Revenue,
-                  Dollar: true,
-                }}
-                setActivePage={setActivePage}
-              />
             </div>
 
             <div className="Charts ">
-              <div className="Left" style={{ marginRight: "60px" }}>
+              <div
+                className="Left animate__animated animate__fadeIn"
+                style={{ marginRight: "60px" }}
+              >
                 <h3 style={{ textAlign: "center" }}>daily income</h3>
-                <div className="Progress">
+                <div className="Progress ">
                   {statistics?.Revenue - oldStatistics?.Revenue === 0 ? (
                     <p style={{ textAlign: "center" }}>no sales were made</p>
                   ) : (
                     <>
                       <Pie
-                        className="Chart animate__animated animate__backInRight"
+                        className="Chart "
                         data={{
-                          labels: ["Profit", "Discounts"],
+                          labels: ["Revenue", "Discounts", "Profit"],
                           datasets: [
                             {
                               label: "$",
@@ -508,31 +502,46 @@ export default function DashBoard(props) {
                                 statistics?.Revenue - oldStatistics?.Revenue,
                                 statistics?.TotalDiscount -
                                   oldStatistics?.TotalDiscount,
+                                statistics?.NetAfterProductCost -
+                                  oldStatistics?.NetAfterProductCost,
                               ],
                               backgroundColor: [
-                                "rgba(57, 204, 110, 0.4)",
+                                "rgba(210, 170, 118, 0.8)",
                                 "rgba(255, 0, 0, 0.8)",
+                                "rgba(57, 204, 110, 0.4)",
                               ],
-                              borderColor: ["#27ae60", "#ee233a"],
+                              borderColor: ["#27ae60", "#ee233a", "#ee233a"],
                               borderWidth: 1,
                             },
                           ],
                         }}
                       />
                       <p>Total daily Profit :</p>
-                      <h3> {statistics?.Revenue - oldStatistics?.Revenue}$</h3>
+                      <h3>
+                        {statistics?.NetAfterProductCost -
+                          oldStatistics?.NetAfterProductCost}
+                        $
+                      </h3>
                       <div className="SideNumbers">
+                        <div className="Right">
+                          <p> Sales</p>
+                          <span>{statistics?.Net - oldStatistics?.Net}$</span>
+                        </div>
                         <div className="Left">
-                          <p> Discounts :</p>
+                          <p> Discounts</p>
                           <span>
                             {statistics?.TotalDiscount -
                               oldStatistics?.TotalDiscount}
                             $
                           </span>
                         </div>
-                        <div className="Right">
-                          <p> Sales :</p>
-                          <span>{statistics?.Net - oldStatistics?.Net}$</span>
+                        <div className="Center">
+                          <p> Revenue</p>
+                          <span>
+                            <span>
+                              {statistics?.Revenue - oldStatistics?.Revenue}$
+                            </span>
+                          </span>
                         </div>
                       </div>
                     </>
@@ -555,7 +564,18 @@ export default function DashBoard(props) {
               <Widget
                 delay=".4s"
                 data={{
-                  Title: "OverAll Discounts:",
+                  Title: "Overall Sales",
+                  Info: statistics.Net,
+                  Link: "",
+                  percent: compareValues.Net,
+                  Dollar: true,
+                }}
+                setActivePage={setActivePage}
+              />
+              <Widget
+                delay=".5s"
+                data={{
+                  Title: "Overall Discounts:",
                   Info: statistics.TotalDiscount,
                   Link: "",
                   percent: "",
@@ -564,12 +584,24 @@ export default function DashBoard(props) {
                 setActivePage={setActivePage}
               />
               <Widget
-                delay=".5s"
+                delay=".4s"
                 data={{
-                  Title: "Overall Profit Before Discounts:",
-                  Info: statistics.Net,
+                  Title: "Overall Revenue",
+                  Info: statistics.Revenue,
                   Link: "",
-                  percent: compareValues.Net,
+                  percent: compareValues.Revenue,
+                  Dollar: true,
+                }}
+                setActivePage={setActivePage}
+              />
+
+              <Widget
+                delay=".6s"
+                data={{
+                  Title: "Overall Profit",
+                  Info: statistics.NetAfterProductCost,
+                  Link: "",
+                  percent: compareValues.NetAfterProductCost,
                   Dollar: true,
                 }}
                 setActivePage={setActivePage}
@@ -633,7 +665,11 @@ export default function DashBoard(props) {
                         <p style={{ marginLeft: "auto" }}>by {note.Maker}</p>
                         <img
                           alt="loading"
-                          src={deleteIcon}
+                          src={
+                            JSON.parse(localStorage.getItem("darkMode"))
+                              ? deleteIconDark
+                              : deleteIcon
+                          }
                           onClick={() => {
                             DeleteNote(index);
                           }}

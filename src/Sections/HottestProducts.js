@@ -19,7 +19,17 @@ export default function HottestProducts(props) {
     }
   });
   return (
-    <>
+    <div
+      style={{
+        width: "100%",
+        height: "500px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "20px",
+      }}
+    >
       {HotProducts.length > 0 && <h2>Hottest Products</h2>}{" "}
       <Swiper
         freeMode={true}
@@ -34,6 +44,6 @@ export default function HottestProducts(props) {
       >
         {HotProducts}
       </Swiper>
-    </>
+    </div>
   );
 }

@@ -16,8 +16,8 @@ export default function Rate(props) {
         <img src={starsGiven >= 4 ? starFilled : Star}></img>
         <img src={starsGiven >= 5 ? starFilled : Star}></img>
       </div>
-      <p className="User">{name.trim() ? name : user}</p>
       <p>{review}</p>
+      <p className="User">{name.trim() ? name : user}</p>
     </div>
   );
 }

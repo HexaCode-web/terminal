@@ -1,10 +1,13 @@
 .Nav  /* nav wrapper*/ {
   position: fixed;
   z-index: 3;
-  backdrop-filter: blur(5px);
-  width: 99%;
+  width: 100%;
+  transition: 0.5s all;
+  padding-bottom: 10px;
 }
-
+.Dark .Nav {
+  background-color: unset;
+}
 .nav {
   position: relative;
   z-index: 4;
@@ -64,6 +67,12 @@
 .search-wrapper input:focus {
   outline: none;
 }
+.Dark .Nav-bg {
+  background-color: #212529;
+}
+.Nav-bg {
+  background-color: #f3f3f3;
+}
 .search-wrapper .itemFour {
   right: 13px;
   position: absolute;
@@ -93,7 +102,7 @@
   width: 50px;
   height: 150px;
 
-  border: 1px solid #9b1e2b;
+  border: 1px solid var(--borders);
   border-radius: 15px;
   animation: BounceIn 1s;
 }

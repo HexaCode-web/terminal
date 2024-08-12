@@ -5,11 +5,14 @@
   gap: 30px;
 }
 .brandBTN {
-  background: -webkit-linear-gradient(450deg, #eee, #ed1a4e);
+  background: -webkit-linear-gradient(179deg, #717171, #ed1a4e);
   background-clip: inherit;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 1.2rem;
   cursor: pointer;
   font-weight: 500;
+}
+.Dark .brandBTN {
+  background: -webkit-linear-gradient(179deg, #717171, #ed1a4e);
 }

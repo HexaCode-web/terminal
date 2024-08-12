@@ -258,7 +258,7 @@ export default function Products(props) {
       <DataTable
         pagination
         highlightOnHover
-        theme="dark"
+        theme={localStorage.getItem("darkMode") ? "Light" : "dark"}
         columns={columns}
         data={data}
       />

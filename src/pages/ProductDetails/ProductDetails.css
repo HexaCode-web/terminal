@@ -5,7 +5,7 @@
 .Stock {
   color: white;
   border: 1px solid green;
-  margin: auto 0px;
+  margin: 15px 0px;
   width: fit-content;
   padding: 0 10px;
   border-radius: 50px;
@@ -17,6 +17,18 @@
   border: 1px solid red;
   background-color: red;
 }
+.Details .Stock {
+  font-size: 16px;
+  margin: 0;
+  background-color: transparent;
+  border: none;
+  color: black;
+  padding: 0;
+  letter-spacing: unset;
+}
+.Details .out {
+  color: #ff0000;
+}
 .Details {
   margin: 0 auto;
   margin-top: 150px;
@@ -24,7 +36,11 @@
   width: 95%;
   min-height: fit-content;
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  display: flex;
   gap: 60px;
+  margin-bottom: 90px;
 }
 .RateModalWrapper .modal-content .modal-body {
   gap: 20px;
@@ -39,7 +55,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: column !important;
 }
 .RateModalWrapper .modal-body .formItem #Review {
   width: 100%;
@@ -61,22 +77,23 @@
   flex-direction: column;
 }
 .Details .left {
+  gap: 30px;
   display: flex;
   flex-direction: row-reverse;
   justify-content: center;
   align-items: center;
 }
 .Details .left .MainIMG-wrapper {
-  min-height: 600px;
-  min-width: 500px;
   display: flex;
   align-items: center;
+  width: 500px;
+  height: 500px;
 }
 .Details .left .mainIMG {
-  width: 500px;
+  object-fit: contain;
 
-  max-width: 500px;
-  max-height: 600px;
+  width: 100%;
+  height: 100%;
 }
 .Details .left img {
   border-radius: 20px;
@@ -115,20 +132,77 @@
   }
 }
 .Details .right {
+  position: relative;
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   font-weight: 700;
+  gap: 20px;
 }
 .Details .right .Rating-wrapper {
   animation-delay: 0.2s;
 }
 .Details .right .Overview {
   animation-delay: 0.3s;
+  text-align: left;
 }
-.Details .right .Sold-wrapper {
+.Details .right .TopBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+}
+.Details .right .Sold-wrapper {
+  font-size: 14px;
+  color: #333;
+  margin: 10px 0;
+}
+.Details .right .brand {
+  font-size: 16px;
+  color: #555;
+  margin-top: 10px;
+  font-weight: bold;
+}
+.Details .right .category {
+  font-size: 16px;
+  color: #777;
   margin-bottom: 15px;
-  animation-delay: 0.4s;
+  font-weight: bold;
+}
+.Details .right .tags-wrapper {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  width: 150px;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+.Details .right .hot-product-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #ff5733; /* Bright red-orange color */
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 20px;
+
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.Details .right .popular-product-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: green; /* Bright yellow color */
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 .Details .right .smallHeader {
   color: orange;
@@ -139,17 +213,28 @@
 .Details .right .Product {
   font-size: 2rem;
   font-style: normal;
-  margin-top: 0;
+  text-align: left;
+  margin: 0;
 }
 .Details .right .Overview {
-  opacity: 0.8;
-  font-weight: 400;
-  font-size: 1.1rem;
+  font-size: 14px;
+  color: #555;
+  margin: 10px 0;
+}
+.Dark .Details .right .Overview,
+.Dark .Details .right .brand,
+.Dark .Details .right .category,
+.Dark .Details .right .Sold-wrapper,
+.Dark .Details .right .Price,
+.Dark .Details .right .OldPrice,
+.Dark .Details .right .Rating-wrapper span {
+  color: #f3f3f3;
 }
 .Details .right .Price {
-  margin-bottom: 0;
-  align-items: center;
-  font-size: 1.7rem;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 10px 0;
   animation-delay: 0.5s;
 }
 .Details .right .Stock span {
@@ -163,9 +248,10 @@
   color: orange;
 }
 .Details .right .OldPrice {
-  margin-top: 0;
-  opacity: 0.3;
+  font-size: 16px;
+  color: #999;
   text-decoration: line-through;
+  margin-left: 10px;
 }
 .Details .right .buttons {
   display: flex;
@@ -175,14 +261,9 @@
 }
 .Details .right .Rating-wrapper {
   display: flex;
-  margin: 20px auto;
   align-items: center;
-  justify-content: center;
-  /* Add vendor prefixes */
+  justify-content: left;
   gap: 10px;
-  gap: 0.525rem;
-  -webkit-gap: 10px;
-  -webkit-gap: 0.525rem;
 }
 .Details .right .Rating-wrapper span {
   font-weight: lighter;
@@ -203,20 +284,22 @@
 .Details h2 {
   margin: 20px;
 }
+.Dark .Details .right .cart {
+  color: white;
+}
 .Details .right .cart {
   animation-delay: 1s;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 1rem;
   display: flex;
   gap: 20px;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: black;
   margin-left: 20px;
   border-radius: 10px;
   background-color: rgba(131, 116, 99, 0);
   border: 1.5px solid #ed1a4e;
-  width: 300px;
   height: 50px;
   --c: #ee233a; /* the border color */
   --b: 2px; /* the border thickness*/
@@ -234,10 +317,14 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 100%;
+  width: 95%;
+  margin: auto;
+  margin-bottom: 90px;
 }
-.UserRates h3 {
-  text-align: center;
+.UserRates h2 {
+  width: 100%;
+  margin-left: 30px;
+  text-align: left;
 }
 .button-inactive {
   cursor: not-allowed !important;
@@ -254,21 +341,6 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: hsla(266, 63%, 26%, 1);
-
-  background: linear-gradient(
-    90deg,
-    hsla(266, 63%, 26%, 1) 0%,
-    hsla(354, 55%, 63%, 1) 84%,
-    hsla(31, 100%, 74%, 1) 100%
-  );
-
-  background: -moz-linear-gradient(
-    90deg,
-    hsla(266, 63%, 26%, 1) 0%,
-    hsla(354, 55%, 63%, 1) 84%,
-    hsla(31, 100%, 74%, 1) 100%
-  );
 
   background: -webkit-linear-gradient(
     90deg,
@@ -280,13 +352,25 @@
   filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#3E196E", endColorstr="#D46C76", GradientType=1 );
   border-radius: 15px;
   width: 300px;
+  color: black;
+  padding: 15px;
   height: 300px;
 }
+.Dark .RateWrapper {
+  color: black;
+}
+.RateWrapper p {
+  width: 100%;
+}
 .RateWrapper .User {
-  font-size: 1.6rem;
+  font-size: 0.9rem;
+  text-align: left;
+  width: 100%;
+  opacity: 0.7;
 }
 .RateWrapper .ratingOuter {
   display: flex;
+  gap: 10px;
   margin: 30px;
 }
 .RateWrapper .ratingOuter img {

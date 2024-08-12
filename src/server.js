@@ -7,6 +7,8 @@ import {
   getFirestore,
   getDoc,
   deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -56,6 +58,26 @@ export const GETCOLLECTION = async (target) => {
    cleanData = response;
 });
 */
+export const QUERY = async (collectionName, propertyInDB, operation, value) => {
+  try {
+    const q = query(
+      collection(db, collectionName),
+      where(propertyInDB, operation, value)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const matches = [];
+
+    querySnapshot.forEach((doc) => {
+      matches.push(doc.data());
+    });
+
+    return matches;
+  } catch (error) {
+    console.error("Error during query:", error);
+  }
+};
 export const UPDATEEMAIL = async (newEmail = "") => {
   try {
     onAuthStateChanged(auth, (user) => {

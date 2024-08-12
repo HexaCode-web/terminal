@@ -5,10 +5,13 @@
 .Categories .Modal {
   width: fit-content;
   margin: auto;
-  color: white !important;
+  color: black !important;
+}
+.Dark .Categories .Modal {
+  color: white;
 }
 .Categories input[type="text"] {
-  border: 1px solid black;
+  border: 1px solid var(--borders);
 }
 .Categories .table img {
   max-width: 200px;
@@ -18,7 +21,7 @@
   width: 60%;
   margin: auto;
   height: fit-content;
-  border: 1px solid white;
+  border: 1px solid var(--borders);
   border-radius: 20px;
   margin-bottom: 40px;
 }

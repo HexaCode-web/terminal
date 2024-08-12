@@ -1,7 +1,7 @@
 .ViewUser {
   display: flex;
   width: 100vw;
-  height: 98vh;
+  height: fit-content;
   flex-direction: column;
   margin-top: 90px;
 }
@@ -12,7 +12,6 @@
   width: 100%;
   justify-content: left;
   display: flex;
-  height: 90%;
 }
 .ViewUser .Content .Left {
   z-index: 100;
@@ -61,7 +60,7 @@
   min-width: 400px;
   display: flex;
   flex-direction: column;
-  border: 1px solid #ed1a4e;
+  border: 1px solid var(--borders);
   border-radius: 20px;
   padding: 30px;
   transition: 0.5s all;

@@ -8,6 +8,7 @@ import "swiper/css/autoplay";
 import Card from "../../components/Card/Card";
 import cart from "../../assets/cart-hover.png";
 import wish from "../../assets/heart.png";
+import darkWish from "../../assets/heart dark.png";
 import wished from "../../assets/heart-hover.png";
 import Error404 from "../Error404/Error404";
 import Star from "../../assets/star-empty.png";
@@ -105,7 +106,6 @@ export default function ProductDetails(props) {
       CreateToast("you aren't signed in!", "error");
       return;
     } else {
-      console.log(item);
       setInactive(true);
       let targetProductPlace;
       activeUser.wishlist.find((wish, index) => {
@@ -288,42 +288,36 @@ export default function ProductDetails(props) {
               <div className="ThumbPhotos">{photosEL}</div>
             </div>
             <div className="right">
+              <div className="tags-wrapper">
+                {Product.HotProduct && <div class="hot-product-tag">Hot</div>}
+                {Product.Popular && (
+                  <div class="popular-product-tag">Popular</div>
+                )}
+              </div>
+
+              {Product.brand && <p class="brand">{Product.brand}</p>}
+
               <h1 className="Product animate__animated animate__fadeInRightBig">
                 {Product.title}
               </h1>
-              <div className="Rating-wrapper animate__animated animate__fadeInRightBig">
-                <div className="ratingOuter">
-                  <img src={Product.rating >= 1 ? starFilled : Star}></img>
-                  <img src={Product.rating >= 2 ? starFilled : Star}></img>
-                  <img src={Product.rating >= 3 ? starFilled : Star}></img>
-                  <img src={Product.rating >= 4 ? starFilled : Star}></img>
-                  <img src={Product.rating >= 5 ? starFilled : Star}></img>
-                </div>
-                <span>
-                  ( {Product.UsersRated ? Product.UsersRated.length : 0} users )
-                </span>
-              </div>
+              {Product.category && <p class="category">{Product.category}</p>}
               <p className="Overview animate__animated animate__fadeInRightBig">
                 {Product.description}
               </p>
-              <div className="Sold-wrapper animate__animated animate__fadeInRightBig">
-                <div>{Product.Sold} users bought this</div>
-              </div>
-              {!UserRated && !isAdmin ? (
-                <button
-                  className="Rate cart animate__animated animate__backInUp"
-                  onClick={handleShowModal}
-                >
-                  Rate Product
-                </button>
-              ) : (
-                ""
-              )}
+              <p className="Sold-wrapper animate__animated animate__fadeInRightBig">
+                {Product.Sold} users bought this
+              </p>
+
               <div className="Price-Stock-wrapper  animate__animated animate__fadeInRightBig">
                 $ {""}
                 <span className="Price">
                   {(Product.price - discount1).toFixed(2)}
                 </span>
+                {Product.Offer && (
+                  <span className="OldPrice  animate__animated animate__fadeInRightBig ">
+                    {Product.price}
+                  </span>
+                )}
                 {Product.stock > 0 ? (
                   Product.stock < 5 ? (
                     <p className="Stock">
@@ -336,11 +330,27 @@ export default function ProductDetails(props) {
                   <p className="Stock out">Out of stock</p>
                 )}
               </div>
-              {Product.Offer && (
-                <p className="OldPrice  animate__animated animate__fadeInRightBig ">
-                  {Product.price}
-                </p>
-              )}
+
+              <div className="Rating-wrapper animate__animated animate__fadeInRightBig">
+                <div className="ratingOuter">
+                  <img src={Product.rating >= 1 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 2 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 3 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 4 ? starFilled : Star}></img>
+                  <img src={Product.rating >= 5 ? starFilled : Star}></img>
+                </div>
+                <span>
+                  ( {Product.UsersRated ? Product.UsersRated.length : 0} users )
+                </span>
+                {!UserRated && !isAdmin && (
+                  <button
+                    className="Rate cart animate__animated animate__backInUp"
+                    onClick={handleShowModal}
+                  >
+                    Rate Product
+                  </button>
+                )}
+              </div>
               <div className="buttons">
                 {isAdmin ? (
                   <button
@@ -353,21 +363,31 @@ export default function ProductDetails(props) {
                   </button>
                 ) : (
                   <>
-                    <img
-                      className="Wish animate__animated animate__bounceIn"
-                      src={
-                        Object.keys(activeUser).length !== 0
-                          ? activeUser.wishlist.find((item) => {
-                              return item.title === Product.title;
-                            })
-                            ? wished
-                            : wish
-                          : wish
-                      }
+                    <button
+                      className="cart animate__animated animate__bounceIn"
                       onClick={() => {
                         UpdateWishList(Product);
                       }}
-                    />
+                    >
+                      <img
+                        className="Wish animate__animated animate__bounceIn"
+                        src={
+                          Object.keys(activeUser).length !== 0
+                            ? activeUser.wishlist.find((item) => {
+                                return item.title === Product.title;
+                              })
+                              ? wished
+                              : JSON.parse(localStorage.getItem("darkMode"))
+                              ? darkWish
+                              : wish
+                            : JSON.parse(localStorage.getItem("darkMode"))
+                            ? darkWish
+                            : wish
+                        }
+                      />
+                      Add to Wish List
+                    </button>
+
                     <button
                       className={`cart animate__animated animate__bounceIn ${
                         Product.stock > 0 ? "" : "button-inactive"
@@ -385,7 +405,7 @@ export default function ProductDetails(props) {
             </div>
           </div>
           <div className="UserRates">
-            <h3>What do the users have to say about this product?</h3>
+            <h2>What do the users have to say about this product?</h2>
             <div style={{ width: "100%" }}>
               {Product.UsersRated.length > 0 ? (
                 <Swiper
@@ -412,19 +432,21 @@ export default function ProductDetails(props) {
               )}
             </div>
           </div>
-          <h2> Similar Products</h2>
-          <Swiper
-            freeMode={true}
-            slidesPerView={5}
-            spaceBetween={10}
-            pagination={{
-              clickable: true,
-            }}
-            modules={[Pagination]}
-            className="mySwiper"
-          >
-            {NewProducts}
-          </Swiper>
+          <div style={{ width: "95%", margin: "auto" }}>
+            <h2 style={{ margin: "15px" }}> Similar Products</h2>
+            <Swiper
+              freeMode={true}
+              slidesPerView={5}
+              spaceBetween={10}
+              pagination={{
+                clickable: true,
+              }}
+              modules={[Pagination]}
+              className="mySwiper"
+            >
+              {NewProducts}
+            </Swiper>
+          </div>
           <MyModal
             className="RateModalWrapper"
             show={showModal}

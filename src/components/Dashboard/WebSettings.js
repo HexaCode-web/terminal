@@ -4,7 +4,6 @@ import Upload from "../../assets/upload.png";
 import "./WebSettings.css";
 import { UPLOADPHOTO } from "../../server";
 import { CreateToast } from "../../App";
-import Carousel from "../Carosuel/carosuel";
 import Star from "../../assets/star-empty.png";
 import starFilled from "../../assets/star-filled.png";
 import ProductSelect from "../Web customization components/ProductSelect";
@@ -14,7 +13,11 @@ import SliderList from "../../Sections/SliderList";
 import PageSort from "../Web customization components/PageSort";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import FooterEdit from "../Web customization components/FooterEdit";
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Autoplay, Pagination } from "swiper";
+import "swiper/css/pagination";
+import { v4 as uid } from "uuid";
 const WebSettings = (props) => {
   const [WebData, setWebData] = React.useState({
     headline: null,
@@ -147,34 +150,45 @@ const WebSettings = (props) => {
   };
   const SaveData = async (section = String, Data = {}, listName = "") => {
     CreateToast("Updating", "info");
-    if (section === "List") {
-      const FetchedData = await GETDOC("websiteData", "ExtraLists");
-      const ExtraLists = { ...FetchedData.ExtraLists, [listName]: Data };
-      setWebData((prev) => {
-        return { ...prev, ExtraLists: ExtraLists };
-      });
-      await SETDOC("websiteData", "ExtraLists", { ExtraLists });
+
+    switch (section) {
+      case "List":
+        const FetchedData = await GETDOC("websiteData", "ExtraLists");
+        const ExtraLists = { ...FetchedData.ExtraLists, [listName]: Data };
+        setWebData((prev) => ({ ...prev, ExtraLists }));
+        await SETDOC("websiteData", "ExtraLists", { ExtraLists });
+        break;
+
+      case "sec1":
+        await SETDOC("websiteData", "title", { title: WebData.title });
+        break;
+
+      case "sec2":
+        await SETDOC("websiteData", "headline", { headline: WebData.headline });
+        await SETDOC("websiteData", "subHeadline", {
+          subHeadline: WebData.subHeadline,
+        });
+        break;
+
+      case "sec5":
+        await SETDOC("websiteData", "Lists", { Lists: WebData.Lists });
+        break;
+
+      case "sec6":
+        await SETDOC("websiteData", "pageSort", { pageSort: Data });
+        break;
+
+      case "sec7":
+        await SETDOC("websiteData", "Footer", { Footer: Data });
+        break;
+
+      default:
+        break;
     }
-    if (section === "sec1") {
-      await SETDOC("websiteData", "title", { title: WebData.title });
-    }
-    if (section === "sec2") {
-      await SETDOC("websiteData", "headline", { headline: WebData.headline });
-      await SETDOC("websiteData", "subHeadline", {
-        subHeadline: WebData.subHeadline,
-      });
-    }
-    if (section === "sec5") {
-      await SETDOC("websiteData", "Lists", { Lists: WebData.Lists });
-    }
-    if (section === "sec6") {
-      await SETDOC("websiteData", "pageSort", { pageSort: Data });
-    }
-    if (section === "sec7") {
-      await SETDOC("websiteData", "Footer", { Footer: Data });
-    }
-    CreateToast("data Updated!", "success");
+
+    CreateToast("Data Updated!", "success");
   };
+
   const handleProductChange = (selectedOption, source) => {
     setWebData((prev) => {
       return {
@@ -186,50 +200,106 @@ const WebSettings = (props) => {
   function ReviewProducts(props) {
     const elements = props.Products.map((element, index) => {
       const rating1 = element ? Math.ceil(element.rating) : "";
+      const BannerList = element.images?.map((image) => {
+        return (
+          <SwiperSlide key={uid()}>
+            <img src={image.url} />
+          </SwiperSlide>
+        );
+      });
       return (
         <div className="productReview">
           {element ? (
             <>
               <h4>{element.title}</h4>
-              <Carousel
-                id={index === 0 ? "one" : index === 1 ? "two" : ""}
-                images={element.images}
-              />
-              <p className="description">{element.description}</p>
-              <div>
-                <p className="OldPrice">{element.price}$</p>
-                <span>
-                  Now Only For:
-                  <span style={{ fontWeight: "500" }}>
-                    {element.price -
-                      Math.round(
-                        (element.price * element.discountPercentage) / 100
-                      )}
-                    $
+              <div className="Swiper-Wrapper">
+                <Swiper
+                  freeMode={true}
+                  loop={false}
+                  slidesPerView={1}
+                  spaceBetween={10}
+                  pagination={{
+                    clickable: true,
+                  }}
+                  autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  modules={[Pagination, Autoplay]}
+                  className="mySwiper"
+                >
+                  {BannerList}
+                </Swiper>
+              </div>
+              <div
+                onClick={() => {
+                  window.location.href = `/product/${element.id}`;
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <p className="description">{element.description}</p>
+                <div>
+                  <p className="OldPrice">{element.price}$</p>
+                  <span
+                    style={{
+                      textAlign: "center",
+                      display: "block",
+                      margin: "auto",
+                    }}
+                  >
+                    Now Only For:
+                    <span style={{ fontWeight: "500" }}>
+                      {element.price -
+                        Math.round(
+                          (element.price * element.discountPercentage) / 100
+                        )}
+                      $
+                    </span>
                   </span>
-                </span>
-                <div className="rating">
-                  <img src={rating1 >= 1 ? starFilled : Star} alt="Star"></img>
-                  <img src={rating1 >= 2 ? starFilled : Star} alt="Star"></img>
-                  <img src={rating1 >= 3 ? starFilled : Star} alt="Star"></img>
-                  <img src={rating1 >= 4 ? starFilled : Star} alt="Star"></img>
-                  <img src={rating1 >= 5 ? starFilled : Star} alt="Star"></img>
-                </div>
-                {element.stock ? (
-                  element.stock < 5 ? (
-                    <p className="Stock">
-                      Only{" "}
-                      <span style={{ color: "#ee233a", fontWeight: "bolder" }}>
-                        {element.stock}
-                      </span>{" "}
-                      left!
-                    </p>
+                  <div
+                    className="rating"
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <img
+                      src={rating1 >= 1 ? starFilled : Star}
+                      alt="Star"
+                    ></img>
+                    <img
+                      src={rating1 >= 2 ? starFilled : Star}
+                      alt="Star"
+                    ></img>
+                    <img
+                      src={rating1 >= 3 ? starFilled : Star}
+                      alt="Star"
+                    ></img>
+                    <img
+                      src={rating1 >= 4 ? starFilled : Star}
+                      alt="Star"
+                    ></img>
+                    <img
+                      src={rating1 >= 5 ? starFilled : Star}
+                      alt="Star"
+                    ></img>
+                  </div>
+                  {element.stock ? (
+                    element.stock < 5 ? (
+                      <p className="Stock">
+                        Only{" "}
+                        <span
+                          style={{ color: "#ee233a", fontWeight: "bolder" }}
+                        >
+                          {element.stock}
+                        </span>{" "}
+                        left!
+                      </p>
+                    ) : (
+                      <p className="Stock">In Stock</p>
+                    )
                   ) : (
-                    <p className="Stock">In Stock</p>
-                  )
-                ) : (
-                  <p className="Stock out">Out of stock</p>
-                )}
+                    <p className="Stock out">Out of stock</p>
+                  )}
+                </div>
               </div>
             </>
           ) : (
@@ -377,7 +447,7 @@ const WebSettings = (props) => {
             <button
               className="button"
               onClick={() => {
-                SaveData("Sec2");
+                SaveData("sec2");
               }}
             >
               Save
