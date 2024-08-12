@@ -207,7 +207,7 @@
   scale: 1.1;
   background-color: #ee233a;
 }
-.dark .notes button:hover: {
+.dark .notes button:hover {
   color: white;
 }
 .Notes .input-wrapper {
